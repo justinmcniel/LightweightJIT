@@ -14,7 +14,7 @@ namespace InteractiveCompiler
         public bool RemoveProgram(Guid programID);
         public void ClearPrograms();
 
-        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?> eventHandler);
+        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?>? eventHandler);
         public bool RemoveTriggerEvent(string eventName);
         public void ClearTriggerEvents();
 

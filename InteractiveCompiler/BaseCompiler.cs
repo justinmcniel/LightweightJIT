@@ -51,7 +51,7 @@ namespace InteractiveCompiler
             throw new NotImplementedException();
         }
 
-        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?> eventHandler)
+        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?>? eventHandler)
         {
             throw new NotImplementedException();
         }

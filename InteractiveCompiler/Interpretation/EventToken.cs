@@ -23,7 +23,7 @@ namespace InteractiveCompiler.Interpretation
             string triggerName = Utilities.NextTextToken(text, ref tmpIndex);
             if (tmpIndex == internalIndex || triggerName == "") { return null; }
 
-            if (!compiler.TriggerEvents.TryGetValue(triggerName, out EventHandler? triggerHandler))
+            if (!compiler.TriggerEvents.TryGetValue(triggerName, out var triggerHandler))
             { throw new CompilerException($"Failed To find Trigger called {triggerName}"); }
 
             EventToken res = new()
