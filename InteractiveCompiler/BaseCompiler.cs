@@ -9,11 +9,11 @@ namespace InteractiveCompiler
 {
     public class BaseCompiler : IInteractiveCompiler
     {
-        public Dictionary<string, EventHandler> TriggerEvents { get; } = [];
+        public Dictionary<string, EventHandler<IEnumerable<object?>?>> TriggerEvents { get; } = [];
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; } = [];
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry {  get; } = [];
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; } = [];
-        public Dictionary<Guid, IEnumerable<(EventHandler Handler, Action<object?, EventArgs> function)>> EventTokensRegistry {  get; } = [];
+        public Dictionary<Guid, IEnumerable<(EventHandler<IEnumerable<object?>?> Handler, Action<object?, IEnumerable<object?>?> Reaction)>> EventTokensRegistry {  get; } = [];
 
         public Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; } = [];
 
@@ -32,7 +32,7 @@ namespace InteractiveCompiler
 
             CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
 
-            List<(EventHandler Handler, Action<object?, EventArgs> function)> eventLists = [];
+            List<(EventHandler Handler, Action<object?, EventArgs> Reaction)> eventLists = [];
             throw new NotImplementedException();
 
             if(EventTokensRegistry.ContainsKey(program.ID))
@@ -44,17 +44,40 @@ namespace InteractiveCompiler
         }
         public bool RemoveProgram(Guid programID)
         {
-            throw new NotImplementedException();
+            bool res = false;
+            foreach (var reaction in EventTokensRegistry[programID])
+            {
+                var handler = reaction.Handler;
+                handler -= reaction.Reaction;
+                throw new NotImplementedException();
+            }
+            res |= EventTokensRegistry.Remove(programID);
+            res |= VariableRegistry.Remove(programID);
+            return res;
         }
         public void ClearPrograms()
         {
-            throw new NotImplementedException();
+            foreach (var programID in EventTokensRegistry.Keys)
+            { _ = RemoveProgram(programID); }
+            
+            foreach (var programID in VariableRegistry.Keys)
+            { _ = RemoveProgram(programID); }
         }
 
         public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?>? eventHandler)
         {
-            throw new NotImplementedException();
+            if (eventHandler != null)
+            {
+                TriggerEvents[eventName] = eventHandler;
+            }
+            else
+            {
+                TriggerEvents[eventName] = void (object? sender, IEnumerable<object?>? args) => { };
+            }
+
+            return true;
         }
+        
         public bool RemoveTriggerEvent(string eventName)
         {
             throw new NotImplementedException();

@@ -4,11 +4,11 @@ namespace InteractiveCompiler
 {
     public interface IInteractiveCompiler
     {
-        public Dictionary<string, EventHandler> TriggerEvents { get; }
+        public Dictionary<string, EventHandler<IEnumerable<object?>?>> TriggerEvents { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry { get; }
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
-        public Dictionary<Guid, IEnumerable<(EventHandler Handler, Action<object?, EventArgs> function)>> EventTokensRegistry { get; }
+        public Dictionary<Guid, IEnumerable<(EventHandler<IEnumerable<object?>?> Handler, Action<object?, IEnumerable<object?>?> Reaction)>> EventTokensRegistry { get; }
 
         public Guid RegisterProgram(string programBody);
         public bool RemoveProgram(Guid programID);
