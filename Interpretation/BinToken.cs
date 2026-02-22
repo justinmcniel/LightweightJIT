@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class BinToken
     {
         public int? Value { get; private set; }
-        public static BinToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static BinToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             BinToken res = new();
             int internalIndex = index;

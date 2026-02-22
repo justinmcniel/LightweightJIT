@@ -11,7 +11,7 @@ namespace InteractiveCompiler.Interpretation
         private string? variableName = null;
         private ImmediateToken? immediateToken = null;
         private FunctionCallToken? funcCallToken = null;
-        public static ValueToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ValueToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             int internalIndex = index;
             ValueToken res = new();

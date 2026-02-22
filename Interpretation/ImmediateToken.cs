@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ImmediateToken
     {
         public object? Value { get; private set; }
-        public static ImmediateToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ImmediateToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ImmediateToken res = new();
             int internalIndex = index;

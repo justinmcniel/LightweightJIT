@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class StringToken
     {
         public string? Value { get; private set; }
-        public static StringToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static StringToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             StringToken res = new();
             int internalIndex = index;

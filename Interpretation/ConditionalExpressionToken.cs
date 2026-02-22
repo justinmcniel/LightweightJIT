@@ -12,7 +12,7 @@ namespace InteractiveCompiler.Interpretation
         ExpressionListToken? ifExpressionListToken = null;
         ElseIfExpressionToken? elseIfExpressionToken = null;
         ExpressionListToken? elseExpressionList = null;
-        public static ConditionalExpressionToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ConditionalExpressionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ConditionalExpressionToken res = new();
             int internalIndex = index;

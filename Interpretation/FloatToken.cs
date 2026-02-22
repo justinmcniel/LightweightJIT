@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class FloatToken
     {
         public float? Value { get; private set; }
-        public static FloatToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static FloatToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             FloatToken res = new();
             int internalIndex = index;

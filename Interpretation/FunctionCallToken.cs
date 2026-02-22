@@ -11,7 +11,7 @@ namespace InteractiveCompiler.Interpretation
         private FunctionToken? funcToken = null;
         private ConditionalFunctionCallToken? condFuncCall = null;
         private ArgumentListToken? argListToken = null;
-        public static FunctionCallToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static FunctionCallToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             FunctionCallToken res = new();
             int internalIndex = index;

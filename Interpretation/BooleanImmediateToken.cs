@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class BooleanImmediateToken
     {
         public bool? Value { get; private set; }
-        public static BooleanImmediateToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static BooleanImmediateToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             BooleanImmediateToken res = new();
             int internalIndex = index;

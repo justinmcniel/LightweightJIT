@@ -82,7 +82,7 @@ namespace InteractiveCompiler.Interpretation
             { return text.Length; }
         }
 
-        public static Guid GetCurrentCompilationThreadProgramId(IInterractiveCompiler compiler)
+        public static Guid GetCurrentCompilationThreadProgramId(IInteractiveCompiler compiler)
         {
             if(compiler.CompilationThreadProgramLookupTable.TryGetValue(Environment.CurrentManagedThreadId, out var res))
             { return res; }

@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class HexToken
     {
         public int? Value { get; private set; }
-        public static HexToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static HexToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             HexToken res = new();
             int internalIndex = index;

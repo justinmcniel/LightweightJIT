@@ -2,7 +2,7 @@
 
 namespace InteractiveCompiler
 {
-    public interface IInterractiveCompiler
+    public interface IInteractiveCompiler
     {
         public Dictionary<string, EventHandler> TriggerEvents { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; }

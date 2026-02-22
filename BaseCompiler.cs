@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace InteractiveCompiler
 {
-    public class BaseCompiler : IInterractiveCompiler
+    public class BaseCompiler : IInteractiveCompiler
     {
         public Dictionary<string, EventHandler> TriggerEvents { get; } = [];
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; } = [];
@@ -30,8 +30,7 @@ namespace InteractiveCompiler
             if(index == 0 ||  program == null)
             { return Guid.Empty; }
 
-            if (CompilationThreadProgramLookupTable.ContainsKey(Environment.CurrentManagedThreadId))
-            { CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId); }
+            CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
 
             List<(EventHandler Handler, Action<object?, EventArgs> function)> eventLists = [];
             throw new NotImplementedException();

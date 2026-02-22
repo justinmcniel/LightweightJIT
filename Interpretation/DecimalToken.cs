@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class DecimalToken
     {
         public int? Value { get; private set; }
-        public static DecimalToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static DecimalToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             DecimalToken res = new();
             int internalIndex = index;

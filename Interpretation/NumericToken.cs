@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class NumericToken
     {
         public object? Value { get; private set; }
-        public static NumericToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static NumericToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             NumericToken res = new();
             int internalIndex = index;

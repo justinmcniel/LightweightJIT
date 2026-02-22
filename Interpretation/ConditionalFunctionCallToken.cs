@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ConditionalFunctionCallToken
     {
         private Func<IEnumerable<object?>?, bool>? func;
-        public static ConditionalFunctionCallToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ConditionalFunctionCallToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ConditionalFunctionCallToken res = new();
             int internalIndex = index;

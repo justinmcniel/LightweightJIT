@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ArgumentListToken
     {
         private List<ValueToken> Values { get; } = [];
-        public static ArgumentListToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ArgumentListToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ArgumentListToken res = new();
 

@@ -11,7 +11,7 @@ namespace InteractiveCompiler.Interpretation
         private ValueToken? valueToken = null;
         private FunctionCallToken? funcCallToken = null;
         private ConditionalExpressionToken? condExpToken = null;
-        public static ExpressionToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ExpressionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             int internalIndex = index;
             ExpressionToken res = new();

@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class FunctionToken
     {
         private Func<IEnumerable<object?>?, object?>? func;
-        public static FunctionToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static FunctionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             FunctionToken res = new();
             int internalIndex = index;

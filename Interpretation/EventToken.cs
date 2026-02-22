@@ -12,7 +12,7 @@ namespace InteractiveCompiler.Interpretation
 
         private EventHandler? Trigger { get; set;  }
         private ExpressionListToken? ExpressionList { get; set; }
-        public static EventToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static EventToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             int internalIndex = index;
 

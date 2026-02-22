@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ExpressionListToken
     {
         private List<ExpressionToken> Expressions { get; } = [];
-        public static ExpressionListToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ExpressionListToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ExpressionListToken res = new();
 

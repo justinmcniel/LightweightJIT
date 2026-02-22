@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class EventListToken
     {
         private List<EventToken> Events { get; } = [];
-        public static EventListToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static EventListToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             EventListToken res = new();
 

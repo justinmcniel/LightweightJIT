@@ -21,7 +21,7 @@ namespace InteractiveCompiler.Interpretation
             return else_present && whiteSpace_present && if_present && oParen_present;
         }
 
-        public static ElseIfExpressionToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ElseIfExpressionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ElseIfExpressionToken res = new();
             int internalIndex = index;

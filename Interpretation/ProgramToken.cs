@@ -11,7 +11,7 @@ namespace InteractiveCompiler.Interpretation
         private EventListToken EventList { get; } = new();
 
         public Guid ID { get; private set; }
-        public static ProgramToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ProgramToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ProgramToken res = new()
             { ID = Guid.NewGuid() };

@@ -30,7 +30,7 @@ namespace InteractiveCompiler.Interpretation
         private ConditionalFunctionCallToken? condFuncCall;
         private BooleanComparison boolCompare = new();
 
-        public static ConditionalToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ConditionalToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ConditionalToken res = new();
             int internalIndex = index;

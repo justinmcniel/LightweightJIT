@@ -20,7 +20,7 @@ namespace InteractiveCompiler.Interpretation
 
         public OperatorType? Value { get; private set; }
 
-        public static ComparisonOperatorToken? TryParse(string text, ref int index, IInterractiveCompiler compiler)
+        public static ComparisonOperatorToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ComparisonOperatorToken res = new();
             int internalIndex = index;
