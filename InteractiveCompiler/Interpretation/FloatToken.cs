@@ -17,7 +17,7 @@ namespace InteractiveCompiler.Interpretation
             DecimalToken? d1 = DecimalToken.TryParse(text, ref internalIndex, compiler);
             if (d1 != null)
             {
-                if (!Utilities.NextTokenMatches(text, ref internalIndex, "."))
+                if (Utilities.NextTokenMatches(text, ref internalIndex, "."))
                 {
                     DecimalToken? d2 = DecimalToken.TryParse(text, ref internalIndex, compiler);
                     if (d2 != null)
@@ -29,6 +29,7 @@ namespace InteractiveCompiler.Interpretation
 
             if (res.Value == null)
             { return null; }
+            index = internalIndex;
             return res;
         }
     }

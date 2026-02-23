@@ -9,6 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ExpressionToken
     {
         private ValueToken? valueToken = null;
+        private string? AssignedVariableName = null;
         private FunctionCallToken? funcCallToken = null;
         private ConditionalExpressionToken? condExpToken = null;
         public static ExpressionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
@@ -29,6 +30,7 @@ namespace InteractiveCompiler.Interpretation
                         if (!compiler.VariableRegistry.TryGetValue(compiler.GetThreadsProgramID(), out var variableRegistry))
                         { throw new CompilerException(); }
 
+                        res.AssignedVariableName = varName;
                         variableRegistry[varName] = new();
                         index = internalIndex;
                         return res;

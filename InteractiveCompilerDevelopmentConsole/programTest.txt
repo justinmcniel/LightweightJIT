@@ -1,3 +1,41 @@
 On MyTrigger: MyFunc();
+
 On MyTrigger2: MyFunc2();
+
 On MyTrigger: MyFunc2();
+
+On MyTrigger: MyFunc(triggerArgument);
+MyFunc2(triggerArgument);
+MyFunc()
+myFunc2();
+
+On MyTrigger: MyFunc2(triggerArgument);
+MyFunc(triggerArgument;
+
+On MyTrigger: MyFunc triggerArgument);
+
+On MyTrigger: let myVar1 = triggerArgument;
+let myVar2 = MyFunc();
+let myVar3 = null;
+let myVar4 = true;
+let myVar5 = false;
+let myVar6 = "testString";
+let myVar7 = 0xff;
+let myVar8 = 0b1010;
+let myVar9 = 123.456;
+let myVar10 = 234;
+
+On MyTrigger: if(true) { MyFunc(); }
+if(myVar3 == null) { MyFunc(); }
+else if(true and false) { MyFunc(); }
+else if(MyCondFunc()) { MyFunc(); }
+else if(MyCondFunc(myVar6)) { MyFunc(myVar4, MyVar9); }
+else { MyCondFunc(); }
+
+On MyTrigger: if(	myVar2 != myVar3 or 
+					myVar3 < myVar4 or 
+					myVar4 <= myVar5 or 
+					myVar5 > myVar6 or 
+					myVar6 >= myVar7) 
+		{ MyFunc(); }
+

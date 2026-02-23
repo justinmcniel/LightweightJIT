@@ -60,7 +60,7 @@ namespace InteractiveCompiler.Interpretation
             res.valCompare = new();
             internalIndex = index;
 
-            res.boolCompare.Condition1 = ConditionalToken.TryParse(text, ref internalIndex, compiler);
+            res.boolCompare.Condition1 = ConditionalToken.TryParse(text, ref internalIndex, compiler); //infinite recursion?
             res.boolCompare.Operator = BooleanOperatorToken.TryParse(text, ref internalIndex, compiler);
             res.boolCompare.Condition2 = ConditionalToken.TryParse(text, ref internalIndex, compiler);
             if (res.boolCompare.HasValue())

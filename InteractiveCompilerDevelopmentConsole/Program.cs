@@ -31,10 +31,7 @@ namespace InteractiveCompilerDevelopmentConsole
 
             foreach (var arg in args)
             {
-                if (arg is int argInt)
-                {
-                    x -= argInt;
-                }
+                Console.WriteLine((arg ?? ((object)"EmptyArg")).ToString());
             }
 
             return null;

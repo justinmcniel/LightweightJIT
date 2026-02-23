@@ -14,6 +14,8 @@ namespace InteractiveCompiler.Interpretation
             DecimalToken res = new();
             int internalIndex = index;
 
+            Utilities.SkipWhitespace(text, ref internalIndex);
+
             string val = "";
             try
             {
