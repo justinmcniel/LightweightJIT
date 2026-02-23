@@ -38,7 +38,7 @@ namespace InteractiveCompiler
             if(EventTokensRegistry.ContainsKey(program.ID))
             { RemoveProgram(program.ID); }
 
-            EventTokensRegistry[program.ID] = eventLists;
+            //EventTokensRegistry[program.ID] = eventLists;
 
             return program.ID;
         }
@@ -48,7 +48,18 @@ namespace InteractiveCompiler
             foreach (var reaction in EventTokensRegistry[programID])
             {
                 var handler = reaction.Handler;
-                handler -= reaction.Reaction;
+                //handler -= reaction.Reaction;
+
+                void tmp123(object? a, IEnumerable<object> b)
+                { }
+                handler = handler +  tmp123;
+
+                var tmp234 = tmp123;
+                handler += tmp234.Invoke;
+
+                var tmp345 = tmp234.Invoke;
+                //handler += tmp345;
+                
                 throw new NotImplementedException();
             }
             res |= EventTokensRegistry.Remove(programID);

@@ -25,6 +25,12 @@ namespace InteractiveCompilerDevelopmentConsole
         
         public static void Main(string[] args)
         {
+            EventHandler<object> tmp = (object? sender, object arg) => 
+                { Console.WriteLine(1); };
+            tmp += (object? sender, object arg) => { Console.WriteLine(2); };
+            tmp -= (object? sender, object arg) => { Console.WriteLine(2); };
+            tmp?.Invoke(new(), 1);
+            return;
             DirectoryInfo? codeBaseDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
             while (codeBaseDirectory != null && codeBaseDirectory?.Name != "InteractiveCompilerDevelopmentConsole")
             { codeBaseDirectory = codeBaseDirectory?.Parent; }

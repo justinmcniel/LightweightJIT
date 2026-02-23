@@ -26,9 +26,10 @@ namespace InteractiveCompiler.Interpretation
             if (!compiler.TriggerEvents.TryGetValue(triggerName, out var triggerHandler))
             { throw new CompilerException($"Failed To find Trigger called {triggerName}"); }
 
+            throw new NotImplementedException();
             EventToken res = new()
             {
-                Trigger = triggerHandler,
+                /////Trigger = triggerHandler,
                 ExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler)
             };
 
