@@ -33,6 +33,7 @@ namespace InteractiveCompiler.Interpretation
                 }
             }
 
+            internalIndex = index;
             res.condFuncCall = ConditionalFunctionCallToken.TryParse(text, ref internalIndex, compiler);
             if (res.condFuncCall != null)
             {

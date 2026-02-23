@@ -18,7 +18,9 @@ namespace InteractiveCompiler.Interpretation
 
             int tmpIndex = internalIndex;
             res.variableName = Utilities.NextTextToken(text, ref internalIndex);
-            if (!compiler.VariableRegistry.TryGetValue(Utilities.GetCurrentCompilationThreadProgramId(compiler), out var variableRegistry))
+            if (String.IsNullOrEmpty(res.variableName))
+            { return null; }
+            if (!compiler.VariableRegistry.TryGetValue(compiler.GetThreadsProgramID(), out var variableRegistry))
             { throw new CompilerException(); }
 
             if (!String.IsNullOrEmpty(res.variableName) && variableRegistry.ContainsKey(res.variableName))

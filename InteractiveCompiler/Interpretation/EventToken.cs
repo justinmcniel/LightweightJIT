@@ -10,7 +10,7 @@ namespace InteractiveCompiler.Interpretation
     internal class EventToken
     {
 
-        private EventHandler? Trigger { get; set;  }
+        private string? Trigger { get; set;  }
         private ExpressionListToken? ExpressionList { get; set; }
         public static EventToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
@@ -20,16 +20,18 @@ namespace InteractiveCompiler.Interpretation
             { return null; }
 
             int tmpIndex = internalIndex;
-            string triggerName = Utilities.NextTextToken(text, ref tmpIndex);
+            string triggerName = Utilities.NextTextToken(text, ref internalIndex);
             if (tmpIndex == internalIndex || triggerName == "") { return null; }
 
-            if (!compiler.TriggerEvents.TryGetValue(triggerName, out var triggerHandler))
+            if (!compiler.TriggerEventsRegistry.ContainsKey(triggerName))
             { throw new CompilerException($"Failed To find Trigger called {triggerName}"); }
 
-            throw new NotImplementedException();
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, ":"))
+            { return null; }
+
             EventToken res = new()
             {
-                /////Trigger = triggerHandler,
+                Trigger = triggerName,
                 ExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler)
             };
 

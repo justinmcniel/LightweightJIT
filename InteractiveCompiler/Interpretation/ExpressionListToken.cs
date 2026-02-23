@@ -30,6 +30,8 @@ namespace InteractiveCompiler.Interpretation
 
                     if (tmp == null)
                     { break; }
+
+                    res.Expressions.Add(tmp);
                 }
                 catch (IndexOutOfRangeException)
                 { break; }

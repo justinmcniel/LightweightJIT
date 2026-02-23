@@ -1,1 +1,3 @@
 On MyTrigger: MyFunc();
+On MyTrigger2: MyFunc2();
+On MyTrigger: MyFunc2();

@@ -9,13 +9,16 @@ namespace InteractiveCompiler
 {
     public class BaseCompiler : IInteractiveCompiler
     {
-        public Dictionary<string, EventHandler<IEnumerable<object?>?>> TriggerEvents { get; } = [];
+        public Dictionary<string, List<(Action<object?, IEnumerable<object?>?> Reaction, Guid ProgramID)>> TriggerEventsRegistry { get; } = [];
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; } = [];
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry {  get; } = [];
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; } = [];
-        public Dictionary<Guid, IEnumerable<(EventHandler<IEnumerable<object?>?> Handler, Action<object?, IEnumerable<object?>?> Reaction)>> EventTokensRegistry {  get; } = [];
-
         public Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; } = [];
+
+        public BaseCompiler()
+        {
+            //
+        }
 
         public Guid RegisterProgram(string programBody)
         {
@@ -32,109 +35,103 @@ namespace InteractiveCompiler
 
             CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
 
-            List<(EventHandler Handler, Action<object?, EventArgs> Reaction)> eventLists = [];
+            List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> eventsList = [];
             throw new NotImplementedException();
 
-            if(EventTokensRegistry.ContainsKey(program.ID))
-            { RemoveProgram(program.ID); }
-
-            //EventTokensRegistry[program.ID] = eventLists;
+            foreach(var (Trigger, Reaction) in eventsList)
+            {
+                if (!TriggerEventsRegistry.TryGetValue(Trigger, out var reactionList))
+                {
+                    reactionList = [];
+                    TriggerEventsRegistry[Trigger] = reactionList;
+                }
+                reactionList.Add((Reaction, program.ID));
+            }
 
             return program.ID;
         }
         public bool RemoveProgram(Guid programID)
         {
             bool res = false;
-            foreach (var reaction in EventTokensRegistry[programID])
+            foreach (var kvp in TriggerEventsRegistry)
+            { TriggerEventsRegistry[kvp.Key] = kvp.Value.Where(set =>
             {
-                var handler = reaction.Handler;
-                //handler -= reaction.Reaction;
+                return set.ProgramID != programID;
+            }).ToList() ?? []; }
 
-                void tmp123(object? a, IEnumerable<object> b)
-                { }
-                handler = handler +  tmp123;
-
-                var tmp234 = tmp123;
-                handler += tmp234.Invoke;
-
-                var tmp345 = tmp234.Invoke;
-                //handler += tmp345;
-                
-                throw new NotImplementedException();
-            }
-            res |= EventTokensRegistry.Remove(programID);
             res |= VariableRegistry.Remove(programID);
             return res;
         }
         public void ClearPrograms()
         {
-            foreach (var programID in EventTokensRegistry.Keys)
-            { _ = RemoveProgram(programID); }
+            foreach (var trigger in TriggerEventsRegistry.Keys)
+            { TriggerEventsRegistry[trigger].Clear(); }
             
             foreach (var programID in VariableRegistry.Keys)
             { _ = RemoveProgram(programID); }
         }
 
-        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?>? eventHandler)
+        public bool RegisterTriggerEvent(string eventName, ref EventHandler<object?>? eventHandler)
         {
-            if (eventHandler != null)
+            void Invoker(object? sender, object? triggerArgument)
             {
-                TriggerEvents[eventName] = eventHandler;
-            }
-            else
-            {
-                TriggerEvents[eventName] = void (object? sender, IEnumerable<object?>? args) => { };
-            }
+                foreach(var (Reaction, ProgramID) in TriggerEventsRegistry[eventName])
+                {
+                    VariableRegistry[ProgramID]["triggerArgument"] = triggerArgument;
+                    Reaction.Invoke(sender, [ProgramID]);
+                }
+            };
+
+            eventHandler += Invoker;
+            TriggerEventsRegistry[eventName] = []; // Log this?
 
             return true;
         }
         
-        public bool RemoveTriggerEvent(string eventName)
-        {
-            throw new NotImplementedException();
-        }
-        public void ClearTriggerEvents()
-        {
-            throw new NotImplementedException();
-        }
+        public bool RemoveTriggerEvent(string eventName) => TriggerEventsRegistry.Remove(eventName);
+
+        public void ClearTriggerEvents() => TriggerEventsRegistry.Clear();
 
         public bool RegisterRuntimeFunction(string functionName, Func<IEnumerable<object?>?, object?> function)
         {
-            throw new NotImplementedException();
+            RuntimeFunctionRegistry[functionName] = function;
+            return true;
         }
-        public bool RemoveRuntimeFunction(string functionName)
-        {
-            throw new NotImplementedException();
-        }
-        public void ClearRuntimeFunctions()
-        {
-            throw new NotImplementedException();
-        }
+
+        public bool RemoveRuntimeFunction(string functionName) => RuntimeFunctionRegistry.Remove(functionName);
+
+        public void ClearRuntimeFunctions() => RuntimeFunctionRegistry.Clear();
 
         public bool RegisterConditionalFunction(string functionName, Func<IEnumerable<object?>?, bool> function)
         {
-            throw new NotImplementedException();
+            ConditionalFunctionRegistry[functionName] = function;
+            return true;
         }
-        public bool RemoveConditionalFunction(string functionName)
-        {
-            throw new NotImplementedException();
-        }
-        public void ClearConditionalFunctions()
+
+        public bool RemoveConditionalFunction(string functionName) => ConditionalFunctionRegistry.Remove(functionName);
+
+        public void ClearConditionalFunctions() => ConditionalFunctionRegistry.Clear();
+
+        public bool RegisterProperty(string propertyName, Func<object?> Getter, Action<object?> Setter)
         {
             throw new NotImplementedException();
         }
 
-        public bool RegisterProperty(string propertyName, Func<object?> getter, Action<object?> setter)
-        {
-            throw new NotImplementedException();
-        }
         public bool RemoveProperty(string propertyName)
         {
             throw new NotImplementedException();
         }
+
         public void ClearProperties()
         {
             throw new NotImplementedException();
+        }
+
+        public Guid GetThreadsProgramID()
+        {
+            if (!CompilationThreadProgramLookupTable.TryGetValue(Environment.CurrentManagedThreadId, out var res))
+            { return Guid.Empty; }
+            return res;
         }
     }
 }

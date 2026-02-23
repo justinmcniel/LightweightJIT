@@ -5,7 +5,8 @@ namespace InteractiveCompilerDevelopmentConsole
     public static class Program
     {
         private static int x = 5;
-        public static event EventHandler<IEnumerable<object?>?>? MyEvent;
+        public static event EventHandler<object?>? MyEvent;// = (sender, args) => 
+        //{ Console.WriteLine($"{nameof(MyEvent)} triggered by {(sender ?? "UNKNOWN")} with the args of {args?.ToString()}"); };
 
         public static object? MyFunc(IEnumerable<object?>? args)
         {
@@ -22,16 +23,26 @@ namespace InteractiveCompilerDevelopmentConsole
 
             return null;
         }
+
+        public static object? MyFunc2(IEnumerable<object?>? args)
+        {
+            if (args == null)
+            { throw new Exception("Got No Args"); }
+
+            foreach (var arg in args)
+            {
+                if (arg is int argInt)
+                {
+                    x -= argInt;
+                }
+            }
+
+            return null;
+        }
         
         public static void Main(string[] args)
         {
-            EventHandler<object> tmp = (object? sender, object arg) => 
-                { Console.WriteLine(1); };
-            tmp += (object? sender, object arg) => { Console.WriteLine(2); };
-            tmp -= (object? sender, object arg) => { Console.WriteLine(2); };
-            tmp?.Invoke(new(), 1);
-            return;
-            DirectoryInfo? codeBaseDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            DirectoryInfo? codeBaseDirectory = new(Directory.GetCurrentDirectory());
             while (codeBaseDirectory != null && codeBaseDirectory?.Name != "InteractiveCompilerDevelopmentConsole")
             { codeBaseDirectory = codeBaseDirectory?.Parent; }
 
@@ -43,12 +54,22 @@ namespace InteractiveCompilerDevelopmentConsole
             
             string programBody = File.ReadAllText($"{consoleBaseDir.FullName}/programTest.txt");
             BaseCompiler compiler = new();
-            if (!compiler.RegisterTriggerEvent("MyTrigger", MyEvent))
+
+            if (!compiler.RegisterTriggerEvent("MyTrigger", ref MyEvent))
             {
                 throw new Exception("Failed to register trigger");
             }
 
-            
+            if(!compiler.RegisterRuntimeFunction("MyFunc", MyFunc))
+            {
+                throw new Exception("Failed to register function");
+            }
+
+            if(!compiler.RegisterRuntimeFunction("MyFunc2", MyFunc2))
+            {
+                throw new Exception("Failed to register function");
+            }
+
             var programID = compiler.RegisterProgram(programBody);
 
             if (programID == Guid.Empty)
@@ -56,7 +77,7 @@ namespace InteractiveCompilerDevelopmentConsole
                 throw new Exception("Failed to compile program");
             }
             
-            MyEvent?.Invoke(new object(), [1, 2, 3, 'a', "b", 'c']);
+            MyEvent?.Invoke("Main", 68);
 
             return;
         }

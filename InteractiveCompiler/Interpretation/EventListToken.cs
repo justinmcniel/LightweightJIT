@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,9 +32,13 @@ namespace InteractiveCompiler.Interpretation
 
                         internalIndex = nextEventStart;
                     }
+                    else
+                    {
+                        res.Events.Add(tmp);
+                    }
                 }
-                catch (IndexOutOfRangeException)
-                { break; }
+                catch (IndexOutOfRangeException) { break; }
+                catch (CompilerException) { internalIndex++; } //ignore, and try to find the next Event
             }
 
             if (res.Events.Count == 0)

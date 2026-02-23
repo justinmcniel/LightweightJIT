@@ -4,18 +4,17 @@ namespace InteractiveCompiler
 {
     public interface IInteractiveCompiler
     {
-        public Dictionary<string, EventHandler<IEnumerable<object?>?>> TriggerEvents { get; }
+        public Dictionary<string, List<(Action<object?, IEnumerable<object?>?> Reaction, Guid ProgramID)>> TriggerEventsRegistry { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry { get; }
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
-        public Dictionary<Guid, IEnumerable<(EventHandler<IEnumerable<object?>?> Handler, Action<object?, IEnumerable<object?>?> Reaction)>> EventTokensRegistry { get; }
 
         public Guid RegisterProgram(string programBody);
         public bool RemoveProgram(Guid programID);
         public void ClearPrograms();
 
-        public bool RegisterTriggerEvent(string eventName, EventHandler<IEnumerable<object?>?>? eventHandler);
-        public bool RemoveTriggerEvent(string eventName);
+        public bool RegisterTriggerEvent(string eventName, ref EventHandler<object?>? eventHandler);
+        public bool RemoveTriggerEvent(string eventName); //does not remove existing functions from the EventHandlers
         public void ClearTriggerEvents();
 
         public bool RegisterRuntimeFunction(string functionName, Func<IEnumerable<object?>?, object?> function);
@@ -26,10 +25,11 @@ namespace InteractiveCompiler
         public bool RemoveConditionalFunction(string functionName);
         public void ClearConditionalFunctions();
 
-        public bool RegisterProperty(string propertyName, Func<object?> getter, Action<object?> setter);
+        public bool RegisterProperty(string propertyName, Func<object?> Getter, Action<object?> Setter);
         public bool RemoveProperty(string propertyName);
         public void ClearProperties();
 
         internal Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; }
+        internal Guid GetThreadsProgramID();
     }
 }

@@ -71,7 +71,8 @@ namespace InteractiveCompiler.Interpretation
                     while (text[index] != token[0]) 
                     { index++; }
 
-                    if(NextTokenMatches(text, ref index, token, caseSensitive: caseSensitive))
+                    var internalIndex = index;
+                    if(NextTokenMatches(text, ref internalIndex, token, caseSensitive: caseSensitive))
                     {
                         return index;
                     }
@@ -80,13 +81,6 @@ namespace InteractiveCompiler.Interpretation
             }
             catch (IndexOutOfRangeException)
             { return text.Length; }
-        }
-
-        public static Guid GetCurrentCompilationThreadProgramId(IInteractiveCompiler compiler)
-        {
-            if(compiler.CompilationThreadProgramLookupTable.TryGetValue(Environment.CurrentManagedThreadId, out var res))
-            { return res; }
-            return Guid.Empty;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace InteractiveCompiler.Interpretation
                     res.valueToken = ValueToken.TryParse(text, ref internalIndex, compiler);
                     if (res.valueToken != null)
                     {
-                        if (!compiler.VariableRegistry.TryGetValue(Utilities.GetCurrentCompilationThreadProgramId(compiler), out var variableRegistry))
+                        if (!compiler.VariableRegistry.TryGetValue(compiler.GetThreadsProgramID(), out var variableRegistry))
                         { throw new CompilerException(); }
 
                         variableRegistry[varName] = new();
