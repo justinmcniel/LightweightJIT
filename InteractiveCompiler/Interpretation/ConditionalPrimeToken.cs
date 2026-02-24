@@ -8,16 +8,14 @@ namespace InteractiveCompiler.Interpretation
 {
     internal class ConditionalPrimeToken
     {
-        private struct ValueComparison
+        private class ValueComparison
         {
             public ValueToken? Value1;
             public ComparisonOperatorToken? Comparator;
             public ValueToken? Value2;
-
-            public readonly bool HasValue() => Value1 != null && Comparator != null && Value2 != null;
         }
 
-        private ValueComparison valCompare = new();
+        private ValueComparison? valCompare;
         private BooleanImmediateToken? booleanImmediate;
         private ConditionalFunctionCallToken? condFuncCall;
 
@@ -26,15 +24,18 @@ namespace InteractiveCompiler.Interpretation
             ConditionalPrimeToken res = new();
             int internalIndex = index;
 
-            res.valCompare.Value1 = ValueToken.TryParse(text, ref internalIndex, compiler);
-            res.valCompare.Comparator = ComparisonOperatorToken.TryParse(text, ref internalIndex, compiler);
-            res.valCompare.Value2 = ValueToken.TryParse(text, ref internalIndex, compiler);
-            if (res.valCompare.HasValue())
+            res.valCompare = new()
+            {
+                Value1 = ValueToken.TryParse(text, ref internalIndex, compiler),
+                Comparator = ComparisonOperatorToken.TryParse(text, ref internalIndex, compiler),
+                Value2 = ValueToken.TryParse(text, ref internalIndex, compiler)
+            };
+            if (res.valCompare.Value1 != null && res.valCompare.Comparator != null && res.valCompare.Value2 != null)
             {
                 index = internalIndex;
                 return res;
             }
-            res.valCompare = new();
+            res.valCompare = null;
             internalIndex = index;
 
             res.booleanImmediate = BooleanImmediateToken.TryParse(text, ref internalIndex, compiler);
