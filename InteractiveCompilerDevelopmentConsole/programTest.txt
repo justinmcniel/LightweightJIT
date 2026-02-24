@@ -29,7 +29,8 @@ On MyTrigger: if(true) { MyFunc(); }
 if(myVar3 == null) { MyFunc(); }
 else if(true and false) { MyFunc(); }
 else if(MyCondFunc()) { MyFunc(); }
-else if(MyCondFunc(myVar6)) { MyFunc(myVar4, MyVar9); }
+else if(MyCondFunc(myVar6)) 
+{ MyFunc(myVar4, myVar9); }
 else { MyCondFunc(); }
 
 On MyTrigger: if(	myVar2 != myVar3 or 

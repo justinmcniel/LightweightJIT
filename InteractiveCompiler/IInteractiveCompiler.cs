@@ -7,7 +7,7 @@ namespace InteractiveCompiler
         public Dictionary<string, List<(Action<object?, IEnumerable<object?>?> Reaction, Guid ProgramID)>> TriggerEventsRegistry { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, object?>> RuntimeFunctionRegistry { get; }
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry { get; }
-        public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
+        protected Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
 
         public Guid RegisterProgram(string programBody);
         public bool RemoveProgram(Guid programID);
@@ -31,5 +31,8 @@ namespace InteractiveCompiler
 
         internal Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; }
         internal Guid GetThreadsProgramID();
+        internal void NewVariable(string name);
+        internal bool VariableExists(string name);
+        internal void CreateVariableRegistry();
     }
 }

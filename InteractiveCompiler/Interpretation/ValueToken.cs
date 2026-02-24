@@ -20,10 +20,8 @@ namespace InteractiveCompiler.Interpretation
             res.variableName = Utilities.NextTextToken(text, ref internalIndex);
             if (String.IsNullOrEmpty(res.variableName))
             { return null; }
-            if (!compiler.VariableRegistry.TryGetValue(compiler.GetThreadsProgramID(), out var variableRegistry))
-            { throw new CompilerException(); }
 
-            if (!String.IsNullOrEmpty(res.variableName) && variableRegistry.ContainsKey(res.variableName))
+            if (!String.IsNullOrEmpty(res.variableName) && compiler.VariableExists(res.variableName))
             {
                 index = internalIndex;
                 return res;

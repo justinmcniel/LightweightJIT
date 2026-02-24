@@ -17,7 +17,6 @@ namespace InteractiveCompiler.Interpretation
             int internalIndex = index;
             ExpressionToken res = new();
 
-            int tmpIndex = internalIndex;
             if (Utilities.NextTokenMatches(text, ref internalIndex, "let"))
             { // Variable Assignment
                 string varName = Utilities.NextTextToken(text, ref internalIndex);
@@ -27,27 +26,30 @@ namespace InteractiveCompiler.Interpretation
                     res.valueToken = ValueToken.TryParse(text, ref internalIndex, compiler);
                     if (res.valueToken != null)
                     {
-                        if (!compiler.VariableRegistry.TryGetValue(compiler.GetThreadsProgramID(), out var variableRegistry))
-                        { throw new CompilerException(); }
-
-                        res.AssignedVariableName = varName;
-                        variableRegistry[varName] = new();
-                        index = internalIndex;
-                        return res;
+                        if (Utilities.NextTokenMatches(text, ref internalIndex, ";"))
+                        {
+                            compiler.NewVariable(varName);
+                            res.AssignedVariableName = varName;
+                            index = internalIndex;
+                            return res;
+                        }
                     }
                 }
             }
             res.valueToken = null;
-            internalIndex = tmpIndex;
+            internalIndex = index;
 
             res.funcCallToken = FunctionCallToken.TryParse(text, ref internalIndex, compiler);
             if (res.funcCallToken != null)
             {
-                index = internalIndex;
-                return res;
+                if (Utilities.NextTokenMatches(text, ref internalIndex, ";"))
+                {
+                    index = internalIndex;
+                    return res;
+                }
             }
-            //res.funcCallToken = null; //implicit
-            internalIndex = tmpIndex;
+            res.funcCallToken = null;
+            internalIndex = index;
 
             res.condExpToken = ConditionalExpressionToken.TryParse(text, ref internalIndex, compiler);
             if (res.condExpToken != null)

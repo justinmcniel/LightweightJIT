@@ -18,8 +18,8 @@ namespace InteractiveCompiler.Interpretation
 
             compiler.CompilationThreadProgramLookupTable[Environment.CurrentManagedThreadId] = res.ID;
 
-            compiler.VariableRegistry[res.ID] = [];
-            compiler.VariableRegistry[res.ID]["triggerArgument"] = null;
+            compiler.CreateVariableRegistry();
+            compiler.NewVariable("triggerArgument");
 
             EventListToken? tmp = EventListToken.TryParse(text, ref index, compiler);
 

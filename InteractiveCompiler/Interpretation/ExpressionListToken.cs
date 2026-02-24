@@ -20,12 +20,7 @@ namespace InteractiveCompiler.Interpretation
             {
                 try
                 {
-                    int tmpIndex = internalIndex;
-                    tmp = ExpressionToken.TryParse(text, ref tmpIndex, compiler);
-                    if (!Utilities.NextTokenMatches(text, ref tmpIndex, ";"))
-                    { break; }
-                    internalIndex = tmpIndex;
-
+                    tmp = ExpressionToken.TryParse(text, ref internalIndex, compiler);
                     Utilities.SkipWhitespace(text, ref internalIndex);
 
                     if (tmp == null)

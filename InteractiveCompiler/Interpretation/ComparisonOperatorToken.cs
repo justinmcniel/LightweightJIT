@@ -29,14 +29,14 @@ namespace InteractiveCompiler.Interpretation
             { res.Value = OperatorType.EQUALS; }
             else if (Utilities.NextTokenMatches(text, ref internalIndex, "!="))
             { res.Value = OperatorType.NOT_EQUALS; }
-            else if (Utilities.NextTokenMatches(text, ref internalIndex, "<"))
-            { res.Value = OperatorType.LESS_THAN; }
             else if (Utilities.NextTokenMatches(text, ref internalIndex, "<="))
             { res.Value = OperatorType.LESS_THAN_OR_EQUAL; }
-            else if (Utilities.NextTokenMatches(text, ref internalIndex, ">"))
-            { res.Value = OperatorType.GREATER_THAN; }
+            else if (Utilities.NextTokenMatches(text, ref internalIndex, "<"))
+            { res.Value = OperatorType.LESS_THAN; }
             else if (Utilities.NextTokenMatches(text, ref internalIndex, ">="))
             { res.Value = OperatorType.GREATER_THAN_OR_EQUAL; }
+            else if (Utilities.NextTokenMatches(text, ref internalIndex, ">"))
+            { res.Value = OperatorType.GREATER_THAN; }
 
             if (res.Value == null)
             { return null; }

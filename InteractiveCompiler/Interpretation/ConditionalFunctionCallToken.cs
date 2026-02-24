@@ -8,7 +8,8 @@ namespace InteractiveCompiler.Interpretation
 {
     internal class ConditionalFunctionCallToken
     {
-        private Func<IEnumerable<object?>?, bool>? func;
+        private Func<IEnumerable<object?>?, bool>? func = null;
+        private ArgumentListToken? argListToken = null;
         public static ConditionalFunctionCallToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ConditionalFunctionCallToken res = new();
@@ -16,12 +17,19 @@ namespace InteractiveCompiler.Interpretation
 
             string funcName = Utilities.NextTextToken(text, ref internalIndex);
 
-            if (compiler.ConditionalFunctionRegistry.TryGetValue(funcName, out res.func))
+            if (compiler.ConditionalFunctionRegistry.TryGetValue(funcName, out res.func) && res.func != null)
             {
-                if (res.func != null)
+                if (Utilities.NextTokenMatches(text, ref internalIndex, "("))
                 {
-                    index = internalIndex;
-                    return res;
+                    res.argListToken = ArgumentListToken.TryParse(text, ref internalIndex, compiler);
+                    if (res.argListToken != null)
+                    {
+                        if (Utilities.NextTokenMatches(text, ref internalIndex, ")"))
+                        {
+                            index = internalIndex;
+                            return res;
+                        }
+                    }
                 }
             }
 

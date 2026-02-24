@@ -50,7 +50,7 @@ namespace InteractiveCompiler.Interpretation
             SkipWhitespace(text, ref index);
             try
             {
-                while (Char.IsLetterOrDigit(text[index]) | !SymbolsList.Contains(text[index].ToString()))
+                while ((Char.IsLetterOrDigit(text[index]) || !SymbolsList.Contains(text[index].ToString())) && !Char.IsWhiteSpace(text[index]))
                 {
                     res += text[index++];
                 }

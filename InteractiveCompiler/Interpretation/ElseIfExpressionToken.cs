@@ -38,6 +38,7 @@ namespace InteractiveCompiler.Interpretation
                         if (expressions != null && Utilities.NextTokenMatches(text, ref elseifIndex, "}"))
                         {
                             res.CodeBlocks.Add((cond, expressions));
+                            internalIndex = elseifIndex;
                         }
                     }
                 }

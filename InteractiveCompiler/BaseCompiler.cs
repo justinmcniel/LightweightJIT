@@ -81,7 +81,6 @@ namespace InteractiveCompiler
                     Reaction.Invoke(sender, [ProgramID]);
                 }
             };
-
             eventHandler += Invoker;
             TriggerEventsRegistry[eventName] = []; // Log this?
 
@@ -133,5 +132,23 @@ namespace InteractiveCompiler
             { return Guid.Empty; }
             return res;
         }
+
+        public void NewVariable(string name)
+        {
+            name = name.Trim();
+            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            { throw new CompilerException(); }
+            variableRegistry[name] = null;
+        }
+
+        public bool VariableExists(string name)
+        {
+            name = name.Trim();
+            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            { throw new CompilerException(); }
+            return variableRegistry.ContainsKey(name);
+        }
+
+        public void CreateVariableRegistry() => VariableRegistry[GetThreadsProgramID()] = [];
     }
 }

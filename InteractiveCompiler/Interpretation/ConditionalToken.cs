@@ -35,6 +35,47 @@ namespace InteractiveCompiler.Interpretation
             ConditionalToken res = new();
             int internalIndex = index;
 
+            if (text.Length > 5 && false)
+            {/// omfg recursion HELLLLLLLLLLL
+                int tmp = 0;
+                int nextOperatorEnd = Utilities.NextInstanceOf(text, internalIndex, "and");
+                nextOperatorEnd = Math.Min(nextOperatorEnd, Utilities.NextInstanceOf(text, internalIndex, "or"));
+                nextOperatorEnd = Math.Min(nextOperatorEnd, Utilities.NextInstanceOf(text, internalIndex, ";"));
+                nextOperatorEnd = Math.Min(nextOperatorEnd, Utilities.NextInstanceOf(text, internalIndex, ":"));
+                nextOperatorEnd = Math.Min(nextOperatorEnd, Utilities.NextInstanceOf(text, internalIndex, "}"));
+                nextOperatorEnd = Math.Min(nextOperatorEnd, Utilities.NextInstanceOf(text, internalIndex, ")"));
+                nextOperatorEnd = Math.Min(nextOperatorEnd, text.Length - 1);
+                string segment = text[internalIndex..nextOperatorEnd];
+                res.boolCompare.Condition1 = ConditionalToken.TryParse(segment, ref tmp, compiler);
+                if (tmp > 0)
+                {
+                    internalIndex += tmp;
+                    res.boolCompare.Operator = BooleanOperatorToken.TryParse(text, ref internalIndex, compiler);
+                    res.boolCompare.Condition2 = ConditionalToken.TryParse(text, ref internalIndex, compiler);
+                    if (res.boolCompare.HasValue())
+                    {
+                        index = internalIndex;
+                        return res;
+                    }
+                }
+                res.boolCompare = new();
+                internalIndex = index;
+            }
+
+            if (text.Length > 3)
+            {
+                res.valCompare.Value1 = ValueToken.TryParse(text, ref internalIndex, compiler);
+                res.valCompare.Comparator = ComparisonOperatorToken.TryParse(text, ref internalIndex, compiler);
+                res.valCompare.Value2 = ValueToken.TryParse(text, ref internalIndex, compiler);
+                if (res.valCompare.HasValue())
+                {
+                    index = internalIndex;
+                    return res;
+                }
+                res.valCompare = new();
+                internalIndex = index;
+            }
+
             res.booleanImmediate = BooleanImmediateToken.TryParse(text, ref internalIndex, compiler);
             if (res.booleanImmediate != null)
             {
@@ -48,28 +89,6 @@ namespace InteractiveCompiler.Interpretation
                 index = internalIndex; 
                 return res;
             }
-
-            res.valCompare.Value1 = ValueToken.TryParse(text, ref internalIndex, compiler);
-            res.valCompare.Comparator = ComparisonOperatorToken.TryParse(text, ref internalIndex, compiler);
-            res.valCompare.Value2 = ValueToken.TryParse(text, ref internalIndex, compiler);
-            if(res.valCompare.HasValue())
-            {
-                index = internalIndex;
-                return res;
-            }
-            res.valCompare = new();
-            internalIndex = index;
-
-            res.boolCompare.Condition1 = ConditionalToken.TryParse(text, ref internalIndex, compiler); //infinite recursion?
-            res.boolCompare.Operator = BooleanOperatorToken.TryParse(text, ref internalIndex, compiler);
-            res.boolCompare.Condition2 = ConditionalToken.TryParse(text, ref internalIndex, compiler);
-            if (res.boolCompare.HasValue())
-            {
-                index = internalIndex;
-                return res;
-            }
-            //res.boolCompare = new(); //irrelevant
-            //internalIndex = index; //irrelevant
 
             return null;
         }
