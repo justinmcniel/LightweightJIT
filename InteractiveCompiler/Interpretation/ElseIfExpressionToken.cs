@@ -64,5 +64,37 @@ namespace InteractiveCompiler.Interpretation
             }
             return res;
         }
+
+        public Func<bool>? Compile(IInteractiveCompiler compiler)
+        {
+            int len = CodeBlocks.Count;
+            if (len <= 0)
+            { return null; }
+
+            var Conditionals = new Func<bool>[len];
+            var Expressions = new Action[len];
+
+            for (int i = 0; i < len; i++)
+            {
+                var (Conditional, Expression) = CodeBlocks[i];
+                Conditionals[i] = Conditional.Compile(compiler);
+                Expressions[i] = () => { Expression.Compile(compiler)(null, null); };
+            }
+
+            bool Evaluate()
+            {
+                for (int i = 0; i < len; i++)
+                {
+                    if (Conditionals[i]())
+                    {
+                        Expressions[i]();
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            return Evaluate;
+        }
     }
 }

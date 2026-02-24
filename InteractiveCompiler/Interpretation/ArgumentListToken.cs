@@ -27,5 +27,25 @@ namespace InteractiveCompiler.Interpretation
             return res;
         }
         public string Decompile(string indentation = "") => String.Join(", ", Values);
+
+        public Func<IEnumerable<object?>?> Compile(IInteractiveCompiler compiler)
+        {
+            Values[0].Compile(compiler);
+            int len = Values.Count;
+
+            Func<object?>[] Getters = new Func<object?>[len];
+            for(int i = 0; i < len; i++)
+            { Getters[i] = Values[i].Compile(compiler); }
+
+            IEnumerable<object?>? GetArgs()
+            {
+                object?[] res = new object?[len];
+                for (int i = 0;i < len; i++)
+                { res[i] = Getters[i](); }
+                return res;
+            }
+
+            return (len <= 0) ? (() => null) : GetArgs;
+        }
     }
 }

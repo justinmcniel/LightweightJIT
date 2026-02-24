@@ -37,5 +37,14 @@ namespace InteractiveCompiler.Interpretation
             return null;
         }
         public string Decompile(string indentation = "") => $"{funcName ?? ""}({argListToken?.Decompile(indentation)})";
+
+        public Func<bool> Compile(IInteractiveCompiler compiler)
+        {
+            if (func == null)
+            { throw new CompilerException(); }
+
+            var argumentGetter = (argListToken?.Compile(compiler)) ?? throw new CompilerException();
+            return () => func(argumentGetter());
+        }
     }
 }

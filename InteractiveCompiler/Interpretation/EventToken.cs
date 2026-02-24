@@ -48,5 +48,12 @@ namespace InteractiveCompiler.Interpretation
             res += indentation + "On " + Trigger + ": " + ExpressionList?.Decompile(indentation);
             return res;
         }
+
+        public (string Trigger, Action<object?, IEnumerable<object?>?> Reaction) Compile(IInteractiveCompiler compiler)
+        {
+            if (Trigger == null || ExpressionList == null)
+            { throw new CompilerException(); }
+            return (Trigger, ExpressionList.Compile(compiler));
+        }
     }
 }

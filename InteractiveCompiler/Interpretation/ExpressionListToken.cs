@@ -52,5 +52,30 @@ namespace InteractiveCompiler.Interpretation
 
             return res;
         }
+
+        public Action<object?, IEnumerable<object?>?> Compile(IInteractiveCompiler compiler)
+        {
+            Action[] expressionFuncs = new Action[Expressions.Count];
+            for (int i = 0; i < Expressions.Count; i++)
+            { expressionFuncs[i] = Expressions[i].Compile(compiler); }
+
+            void Reaction(object? sender, IEnumerable<object?>? environment)
+            {
+                Guid programID = Guid.Empty;
+                if (environment != null)
+                {
+                    foreach (var envar in environment)
+                    {
+                        if (envar is Guid ID)
+                        { programID = ID; }
+                    }
+                }
+
+                foreach (var expressionFunc in expressionFuncs)
+                { expressionFunc(); }
+            }
+
+            return Reaction;
+        }
     }
 }

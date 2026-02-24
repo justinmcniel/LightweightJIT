@@ -66,5 +66,7 @@ namespace InteractiveCompiler.Interpretation
 
             return "";
         }
+
+        public Func<object?> Compile(IInteractiveCompiler compiler) => () => Value;
     }
 }

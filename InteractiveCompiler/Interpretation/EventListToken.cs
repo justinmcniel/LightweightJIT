@@ -55,5 +55,13 @@ namespace InteractiveCompiler.Interpretation
             { res += eventToken.Decompile(indentation)  + "\r\n\r\n"; }
             return res;
         }
+
+        public List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> Compile(IInteractiveCompiler compiler)
+        {
+            List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> res = [];
+            foreach(var eventToken in Events)
+            { res.Add(eventToken.Compile(compiler)); }
+            return res;
+        }
     }
 }

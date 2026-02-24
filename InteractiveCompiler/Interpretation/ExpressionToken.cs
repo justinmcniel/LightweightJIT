@@ -80,5 +80,24 @@ namespace InteractiveCompiler.Interpretation
             }
             return res;
         }
+
+        public Action Compile(IInteractiveCompiler compiler)
+        {
+            if (!String.IsNullOrEmpty(AssignedVariableName) && valueToken != null)
+            {
+                var VariableSetter = compiler.VariableSetter(AssignedVariableName);
+                var ValueGetter = valueToken.Compile(compiler);
+                return () => { VariableSetter(ValueGetter()); };
+            }
+            else if (funcCallToken != null)
+            {
+                return () => funcCallToken.Compile(compiler);
+            }
+            else if (condExpToken != null)
+            {
+                return condExpToken.Compile(compiler);
+            }
+            throw new CompilerException();
+        }
     }
 }

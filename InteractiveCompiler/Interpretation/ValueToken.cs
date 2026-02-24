@@ -59,5 +59,16 @@ namespace InteractiveCompiler.Interpretation
             { return funcCallToken.Decompile(indentation); }
             return "";
         }
+
+        public Func<object?> Compile(IInteractiveCompiler compiler)
+        {
+            if (!string.IsNullOrEmpty(variableName))
+            { return compiler.VariableGetter(variableName); }
+            else if (immediateToken != null)
+            { return immediateToken.Compile(compiler); }
+            else if (funcCallToken != null)
+            { return funcCallToken.Compile(compiler); }
+            throw new CompilerException();
+        }
     }
 }

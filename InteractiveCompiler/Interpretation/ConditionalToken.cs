@@ -41,5 +41,21 @@ namespace InteractiveCompiler.Interpretation
             { res += $" {operatorToken.Decompile(indentation)} {value2.Decompile(indentation)}"; }
             return res;
         }
+
+        public Func<bool> Compile(IInteractiveCompiler compiler)
+        {
+            if (value1 == null)
+            { throw new CompilerException(); }
+
+            var Evaluator1 = value1.Compile(compiler);
+
+            if(operatorToken != null && value2 != null)
+            {
+                var Evaluator2 = value2.Compile(compiler);
+                return operatorToken.Compile(compiler, Evaluator1, Evaluator2);
+            }
+
+            return Evaluator1;
+        }
     }
 }

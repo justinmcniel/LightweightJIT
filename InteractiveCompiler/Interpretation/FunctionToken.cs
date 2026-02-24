@@ -38,5 +38,12 @@ namespace InteractiveCompiler.Interpretation
             return null;
         }
         public string Decompile(string indentation = "") => funcName ?? "";
+        public Func<IEnumerable<object?>?, object?> Compile(IInteractiveCompiler compiler)
+        {
+            if (func == null)
+            { throw new CompilerException(); }
+
+            return func;
+        }
     }
 }

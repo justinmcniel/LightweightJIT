@@ -30,13 +30,8 @@ namespace InteractiveCompiler.Interpretation
             res.EventList = tmp;
             return res;
         }
-        /*
-        public string Decompile(string indentation = "")
-        {
-            string res = "";
-            return res;
-        }
-        */
+
         public string Decompile(string indentation = "") => EventList.Decompile(indentation);
+        public List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> Compile(IInteractiveCompiler compiler) => EventList.Compile(compiler);
     }
 }

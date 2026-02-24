@@ -35,8 +35,15 @@ namespace InteractiveCompiler.Interpretation
         public string Decompile(string indentation = "") => Value switch
         {
             OperatorType.AND => "and",
-            OperatorType.OR => "or",
+            OperatorType.OR  => "or",
             _ => "",
+        };
+
+        public Func<bool> Compile(IInteractiveCompiler compiler, Func<bool> Evaluator1, Func<bool> Evaluator2) => Value switch
+        {
+            OperatorType.AND => () => (Evaluator1() && Evaluator2()),
+            OperatorType.OR  => () => (Evaluator1() || Evaluator2()),
+            _ => throw new CompilerException(),
         };
     }
 }

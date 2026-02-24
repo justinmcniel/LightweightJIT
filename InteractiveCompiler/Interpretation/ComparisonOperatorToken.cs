@@ -54,5 +54,44 @@ namespace InteractiveCompiler.Interpretation
             OperatorType.GREATER_THAN_OR_EQUAL => ">=",
             _ => "",
         };
+
+        public Func<bool> Compile(IInteractiveCompiler compiler, Func<object?> LeftEvaluator, Func<object?> RightEvaluator) => Value switch
+        {
+            OperatorType.EQUALS => () => (LeftEvaluator() == RightEvaluator()),
+            OperatorType.NOT_EQUALS => () => (LeftEvaluator() != RightEvaluator()),
+            OperatorType.LESS_THAN => () =>
+                                {
+                                    if (LeftEvaluator() is IComparable left && RightEvaluator() is IComparable right)
+                                    { return left.CompareTo(right) < 0; }
+                                    throw new Exception();
+                                }
+
+            ,
+            OperatorType.LESS_THAN_OR_EQUAL => () =>
+                {
+                    if (LeftEvaluator() is IComparable left && RightEvaluator() is IComparable right)
+                    { return left.CompareTo(right) <= 0; }
+                    throw new Exception();
+                }
+
+            ,
+            OperatorType.GREATER_THAN => () =>
+                {
+                    if (LeftEvaluator() is IComparable left && RightEvaluator() is IComparable right)
+                    { return left.CompareTo(right) > 0; }
+                    throw new Exception();
+                }
+
+            ,
+            OperatorType.GREATER_THAN_OR_EQUAL => () =>
+                {
+                    if (LeftEvaluator() is IComparable left && RightEvaluator() is IComparable right)
+                    { return left.CompareTo(right) >= 0; }
+                    throw new Exception();
+                }
+
+            ,
+            _ => throw new CompilerException(),
+        };
     }
 }

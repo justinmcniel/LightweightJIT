@@ -13,6 +13,8 @@ namespace InteractiveCompiler.Interpretation
             public ValueToken? Value1;
             public ComparisonOperatorToken? Comparator;
             public ValueToken? Value2;
+
+            public bool HasValue() => Value1 != null && Comparator != null && Value2 != null;
         }
 
         private ValueComparison? valCompare;
@@ -30,7 +32,7 @@ namespace InteractiveCompiler.Interpretation
                 Comparator = ComparisonOperatorToken.TryParse(text, ref internalIndex, compiler),
                 Value2 = ValueToken.TryParse(text, ref internalIndex, compiler)
             };
-            if (res.valCompare.Value1 != null && res.valCompare.Comparator != null && res.valCompare.Value2 != null)
+            if (res.valCompare.HasValue())
             {
                 index = internalIndex;
                 return res;
@@ -67,6 +69,28 @@ namespace InteractiveCompiler.Interpretation
             if(condFuncCall != null)
             { return condFuncCall.Decompile(indentation); }
             return "";
+        }
+
+        public Func<bool> Compile(IInteractiveCompiler compiler)
+        {
+            if (valCompare != null && valCompare.HasValue())
+            {
+                var Getter1 = valCompare.Value1!.Compile(compiler);
+                var Getter2 = valCompare.Value2!.Compile(compiler);
+                return valCompare.Comparator!.Compile(compiler, Getter1, Getter2);
+            }
+
+            if (booleanImmediate != null)
+            {
+                return booleanImmediate.Compile(compiler);
+            }
+
+            if (condFuncCall != null)
+            {
+                return condFuncCall.Compile(compiler);
+            }
+
+            throw new CompilerException();
         }
     }
 }

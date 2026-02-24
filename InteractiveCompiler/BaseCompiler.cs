@@ -23,6 +23,8 @@ namespace InteractiveCompiler
         {
             VariableRegistry[Guid.Empty] = [];
             RegisterTriggerEvent("Immediately", ref OnCompilationComplete);
+            RegisterRuntimeFunction("Get", GetProperty);
+            RegisterRuntimeFunction("Set", SetProperty);
         }
 
         public Guid RegisterProgram(string programBody)
@@ -42,8 +44,7 @@ namespace InteractiveCompiler
 
             ProgramTokenLookupTable[program.ID] = program;
 
-            List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> eventsList = [];
-            throw new NotImplementedException();
+            var eventsList = program.Compile(this);
 
             foreach(var (Trigger, Reaction) in eventsList)
             {
@@ -134,6 +135,39 @@ namespace InteractiveCompiler
             return true;
         }
 
+        private object? SetProperty(IEnumerable<object?>? args)
+        {
+            if(args != null && args.Count() == 2)
+            {
+                if (args.ElementAt(0) is string property)
+                {
+                    if (BoundProperties.TryGetValue(property, out var accessor))
+                    {
+                        accessor.Setter(args.ElementAt(1));
+                        return true;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private object? GetProperty(IEnumerable<object?>? args)
+        {
+            if(args != null && args.Count() == 1)
+            {
+                if (args.ElementAt(0) is string property)
+                {
+                    if (BoundProperties.TryGetValue(property, out var accessor))
+                    {
+                        return accessor.Getter();
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public Func<object?> PropertyGetter(string propertyName) => BoundProperties[propertyName].Getter;
 
         public Action<object?> PropertySetter(string propertyName) => BoundProperties[propertyName].Setter;
@@ -166,22 +200,28 @@ namespace InteractiveCompiler
             { throw new CompilerException(); }
             return variableRegistry.ContainsKey(name);
         }
-        public Func<object?> VariableGetter(string variableName)
+        public Func<object?> VariableGetter(string variableName, Guid? guid = null)
         {
             if (BoundProperties.TryGetValue(variableName, out var property))
             { return property.Getter; }
 
-            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            if (guid == null)
+            { guid = GetThreadsProgramID(); }
+
+            if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
             { throw new CompilerException(); }
             return () => { return variableRegistry[variableName]; };
         }
 
-        public Action<object?> VariableSetter(string variableName)
+        public Action<object?> VariableSetter(string variableName, Guid? guid = null)
         {
             if (BoundProperties.TryGetValue(variableName, out var property))
             { return property.Setter; }
 
-            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            if (guid == null)
+            { guid = GetThreadsProgramID(); }
+
+            if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
             { throw new CompilerException(); }
             return (object? value) => { variableRegistry[variableName] = value; };
         }

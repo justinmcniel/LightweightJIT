@@ -78,5 +78,81 @@ namespace InteractiveCompiler.Interpretation
 
             return res;
         }
+
+        public Action Compile(IInteractiveCompiler compiler)
+        {
+            if (ifConditionalToken == null || ifExpressionList == null)
+            { throw new CompilerException(); }
+
+            var IfCond = ifConditionalToken.Compile(compiler);
+            var IfExprCode = ifExpressionList.Compile(compiler);
+
+            Func<bool>? ElseIfHandler = elseIfExpressionToken?.Compile(compiler);
+
+            var ElseExprCode = elseExpressionList?.Compile(compiler);
+
+            if(ElseIfHandler == null)
+            {
+                if (ElseExprCode == null)
+                {
+                    void IfOnly()
+                    {
+                        if (IfCond())
+                        {
+                            IfExprCode(null, null);
+                        }
+                    }
+                    return IfOnly;
+                }
+                else
+                {
+                    void IfElse()
+                    {
+                        if (IfCond())
+                        {
+                            IfExprCode(null, null);
+                        }
+                        else
+                        {
+                            ElseExprCode(null, null);
+                        }
+                    }
+                    return IfElse;
+                }
+            }
+            else
+            {
+                if (ElseExprCode == null)
+                {
+                    void IfElseIf()
+                    {
+                        if(IfCond())
+                        {
+                            IfExprCode(null, null);
+                        }
+                        else
+                        {
+                            _ = ElseIfHandler();
+                        }
+                    }
+                    return IfElseIf;
+                }
+                else
+                {
+                    void IfElseIfElse()
+                    {
+                        if(IfCond())
+                        {
+                            IfExprCode(null, null);
+                        }
+                        else if (!ElseIfHandler())
+                        {
+                            ElseExprCode(null, null);
+                        }
+                    }
+                    return IfElseIfElse;
+                }
+            }
+        }
     }
 }

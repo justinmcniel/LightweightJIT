@@ -36,8 +36,8 @@ namespace InteractiveCompiler
         internal Guid GetThreadsProgramID();
         internal void NewVariable(string name);
         internal bool VariableExists(string name);
-        internal Func<object?> VariableGetter(string variableName);
-        internal Action<object?> VariableSetter(string variableName);
+        internal Func<object?> VariableGetter(string variableName, Guid? guid = null);
+        internal Action<object?> VariableSetter(string variableName, Guid? guid = null);
         internal void CreateVariableRegistry();
     }
 }

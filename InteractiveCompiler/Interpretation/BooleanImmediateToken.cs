@@ -31,5 +31,13 @@ namespace InteractiveCompiler.Interpretation
             { return ""; }
             return (bool)Value ? "true" : "false";
         }
+
+        public Func<bool> Compile(IInteractiveCompiler compiler)
+        {
+            if (Value == null)
+            { throw new CompilerException(); }
+
+            return ((bool)Value) ? (() => true) : (() => false);
+        }
     }
 }
