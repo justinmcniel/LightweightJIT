@@ -27,6 +27,8 @@ namespace InteractiveCompiler
         public void ClearConditionalFunctions();
 
         public bool RegisterProperty(string propertyName, Func<object?> Getter, Action<object?> Setter);
+        public Func<object?> PropertyGetter(string propertyName);
+        public Action<object?> PropertySetter(string propertyName);
         public bool RemoveProperty(string propertyName);
         public void ClearProperties();
 
@@ -34,6 +36,8 @@ namespace InteractiveCompiler
         internal Guid GetThreadsProgramID();
         internal void NewVariable(string name);
         internal bool VariableExists(string name);
+        internal Func<object?> VariableGetter(string variableName);
+        internal Action<object?> VariableSetter(string variableName);
         internal void CreateVariableRegistry();
     }
 }

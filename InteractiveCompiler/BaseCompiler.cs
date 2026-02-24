@@ -15,6 +15,7 @@ namespace InteractiveCompiler
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; } = [];
         public Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; } = [];
         private Dictionary<Guid, ProgramToken> ProgramTokenLookupTable { get; } = [];
+        private Dictionary<string, (Func<object?> Getter, Action<object?> Setter)> BoundProperties { get; } = [];
 
         private event EventHandler<object?>? OnCompilationComplete;
 
@@ -129,18 +130,17 @@ namespace InteractiveCompiler
 
         public bool RegisterProperty(string propertyName, Func<object?> Getter, Action<object?> Setter)
         {
-            throw new NotImplementedException();
+            BoundProperties[propertyName] = (Getter, Setter);
+            return true;
         }
 
-        public bool RemoveProperty(string propertyName)
-        {
-            throw new NotImplementedException();
-        }
+        public Func<object?> PropertyGetter(string propertyName) => BoundProperties[propertyName].Getter;
 
-        public void ClearProperties()
-        {
-            throw new NotImplementedException();
-        }
+        public Action<object?> PropertySetter(string propertyName) => BoundProperties[propertyName].Setter;
+
+        public bool RemoveProperty(string propertyName) => BoundProperties.Remove(propertyName);
+
+        public void ClearProperties() => BoundProperties.Clear();
 
         public Guid GetThreadsProgramID()
         {
@@ -159,10 +159,31 @@ namespace InteractiveCompiler
 
         public bool VariableExists(string name)
         {
+            if (BoundProperties.ContainsKey(name))
+            { return true; }
             name = name.Trim();
             if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
             { throw new CompilerException(); }
             return variableRegistry.ContainsKey(name);
+        }
+        public Func<object?> VariableGetter(string variableName)
+        {
+            if (BoundProperties.TryGetValue(variableName, out var property))
+            { return property.Getter; }
+
+            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            { throw new CompilerException(); }
+            return () => { return variableRegistry[variableName]; };
+        }
+
+        public Action<object?> VariableSetter(string variableName)
+        {
+            if (BoundProperties.TryGetValue(variableName, out var property))
+            { return property.Setter; }
+
+            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+            { throw new CompilerException(); }
+            return (object? value) => { variableRegistry[variableName] = value; };
         }
 
         public void CreateVariableRegistry() => VariableRegistry[GetThreadsProgramID()] = [];
