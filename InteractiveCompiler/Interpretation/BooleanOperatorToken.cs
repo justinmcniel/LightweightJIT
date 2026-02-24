@@ -32,5 +32,11 @@ namespace InteractiveCompiler.Interpretation
             index = internalIndex;
             return res;
         }
+        public string Decompile(string indentation = "") => Value switch
+        {
+            OperatorType.AND => "and",
+            OperatorType.OR => "or",
+            _ => "",
+        };
     }
 }

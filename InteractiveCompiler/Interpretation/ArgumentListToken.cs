@@ -26,5 +26,6 @@ namespace InteractiveCompiler.Interpretation
 
             return res;
         }
+        public string Decompile(string indentation = "") => String.Join(", ", Values);
     }
 }

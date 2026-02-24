@@ -44,5 +44,15 @@ namespace InteractiveCompiler.Interpretation
             index = internalIndex;
             return res;
         }
+        public string Decompile(string indentation = "") => Value switch
+        {
+            OperatorType.EQUALS => "==",
+            OperatorType.NOT_EQUALS => "!=",
+            OperatorType.LESS_THAN => "<",
+            OperatorType.LESS_THAN_OR_EQUAL => "<=",
+            OperatorType.GREATER_THAN => ">",
+            OperatorType.GREATER_THAN_OR_EQUAL => ">=",
+            _ => "",
+        };
     }
 }

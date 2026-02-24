@@ -43,5 +43,12 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "")
+        {
+            if (condFuncCall != null)
+            { return condFuncCall.Decompile(indentation); }
+
+            return $"{funcToken?.Decompile(indentation)}({argListToken?.Decompile(indentation)})";
+        }
     }
 }

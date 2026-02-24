@@ -9,7 +9,7 @@ namespace InteractiveCompiler.Interpretation
     internal class ConditionalExpressionToken
     {
         ConditionalToken? ifConditionalToken = null;
-        ExpressionListToken? ifExpressionListToken = null;
+        ExpressionListToken? ifExpressionList = null;
         ElseIfExpressionToken? elseIfExpressionToken = null;
         ExpressionListToken? elseExpressionList = null;
         public static ConditionalExpressionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
@@ -28,8 +28,8 @@ namespace InteractiveCompiler.Interpretation
 
             if (!Utilities.NextTokenMatches(text, ref internalIndex, "{")) { return null; }
 
-            res.ifExpressionListToken = ExpressionListToken.TryParse(text, ref internalIndex, compiler);
-            if(res.ifExpressionListToken == null) { return null; }
+            res.ifExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler);
+            if(res.ifExpressionList == null) { return null; }
 
             if (!Utilities.NextTokenMatches(text, ref internalIndex, "}")) { return null; }
 
@@ -56,6 +56,26 @@ namespace InteractiveCompiler.Interpretation
             }
 
             index = internalIndex;
+            return res;
+        }
+        public string Decompile(string indentation = "")
+        {
+            string res = "";
+            res += $"if ({ifConditionalToken?.Decompile(indentation)})\r\n{indentation}";
+            res += $"{{\r\n{indentation}\t";
+            res += ifExpressionList?.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+            res += $"}}\r\n{indentation}";
+
+            res += elseIfExpressionToken?.Decompile(indentation);
+
+            if(elseExpressionList != null)
+            {
+                res += $"else\r\n{indentation}";
+                res += $"{{\r\n{indentation}\t";
+                res += elseExpressionList?.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+                res += $"}}\r\n{indentation}";
+            }
+
             return res;
         }
     }

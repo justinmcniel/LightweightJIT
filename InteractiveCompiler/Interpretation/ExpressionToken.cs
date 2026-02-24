@@ -62,5 +62,23 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+
+        public string Decompile(string indentation = "")
+        {
+            string res = "";
+            if (!String.IsNullOrEmpty(AssignedVariableName) && valueToken != null)
+            {
+                res += $"let {AssignedVariableName} = {valueToken.Decompile(indentation)};" + $"\r\n{indentation}";
+            }
+            else if (funcCallToken != null)
+            {
+                res += $"{funcCallToken.Decompile(indentation)};" + $"\r\n{indentation}";
+            }
+            else if (condExpToken != null)
+            {
+                res += condExpToken.Decompile(indentation) + $"\r\n{indentation}";
+            }
+            return res;
+        }
     }
 }

@@ -47,5 +47,13 @@ namespace InteractiveCompiler.Interpretation
             index = internalIndex;
             return res;
         }
+
+        public string Decompile(string indentation = "")
+        {
+            string res = "";
+            foreach (var eventToken in Events)
+            { res += eventToken.Decompile(indentation)  + "\r\n\r\n"; }
+            return res;
+        }
     }
 }

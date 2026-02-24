@@ -34,5 +34,12 @@ namespace InteractiveCompiler.Interpretation
 
             return res;
         }
+        public string Decompile(string indentation = "")
+        {
+            string res = value1?.Decompile(indentation) ?? "";
+            if(operatorToken != null && value2 != null)
+            { res += $" {operatorToken.Decompile(indentation)} {value2.Decompile(indentation)}"; }
+            return res;
+        }
     }
 }

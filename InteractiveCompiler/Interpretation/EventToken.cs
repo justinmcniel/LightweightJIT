@@ -35,10 +35,17 @@ namespace InteractiveCompiler.Interpretation
                 ExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler)
             };
 
-            if(res.ExpressionList == null)
+            if (res.ExpressionList == null)
             { return null; }
 
             index = internalIndex;
+            return res;
+        }
+
+        public string Decompile(string indentation = "")
+        {
+            string res = "";
+            res += indentation + "On " + Trigger + ": " + ExpressionList?.Decompile(indentation);
             return res;
         }
     }

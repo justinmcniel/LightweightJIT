@@ -49,5 +49,15 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "")
+        {
+            if(!string.IsNullOrEmpty(variableName))
+            { return variableName; }
+            else if (immediateToken != null)
+            { return immediateToken.Decompile(indentation); }
+            else if (funcCallToken != null)
+            { return funcCallToken.Decompile(indentation); }
+            return "";
+        }
     }
 }

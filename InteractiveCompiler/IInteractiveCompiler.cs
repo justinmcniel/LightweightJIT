@@ -10,6 +10,7 @@ namespace InteractiveCompiler
         protected Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
 
         public Guid RegisterProgram(string programBody);
+        public string DecompileProgram(Guid programID);
         public bool RemoveProgram(Guid programID);
         public void ClearPrograms();
 

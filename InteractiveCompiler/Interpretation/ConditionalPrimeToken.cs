@@ -54,5 +54,19 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "")
+        {
+            if (valCompare != null)
+            { 
+                return $"{valCompare.Value1!.Decompile(indentation)} " +
+                    $"{valCompare.Comparator!.Decompile(indentation)} " +
+                    $"{valCompare.Value2!.Decompile(indentation)}"; 
+            }
+            if (booleanImmediate != null)
+            { return booleanImmediate.Decompile(indentation); }
+            if(condFuncCall != null)
+            { return condFuncCall.Decompile(indentation); }
+            return "";
+        }
     }
 }

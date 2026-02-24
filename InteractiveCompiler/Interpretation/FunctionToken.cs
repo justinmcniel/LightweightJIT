@@ -8,14 +8,15 @@ namespace InteractiveCompiler.Interpretation
 {
     internal class FunctionToken
     {
+        private string? funcName = null;
         private Func<IEnumerable<object?>?, object?>? func;
         public static FunctionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             FunctionToken res = new();
             int internalIndex = index;
 
-            string funcName = Utilities.NextTextToken(text, ref internalIndex);
-            if (compiler.RuntimeFunctionRegistry.TryGetValue(funcName, out res.func))
+            res.funcName = Utilities.NextTextToken(text, ref internalIndex);
+            if (compiler.RuntimeFunctionRegistry.TryGetValue(res.funcName, out res.func))
             {
                 if (res.func != null)
                 {
@@ -24,7 +25,7 @@ namespace InteractiveCompiler.Interpretation
                 }
             }
 
-            if (compiler.ConditionalFunctionRegistry.TryGetValue(funcName, out var conditionalFunc))
+            if (compiler.ConditionalFunctionRegistry.TryGetValue(res.funcName, out var conditionalFunc))
             {
                 if (conditionalFunc != null)
                 {
@@ -36,5 +37,6 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "") => funcName ?? "";
     }
 }

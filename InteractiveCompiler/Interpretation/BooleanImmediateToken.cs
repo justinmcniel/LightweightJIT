@@ -25,5 +25,11 @@ namespace InteractiveCompiler.Interpretation
             index = internalIndex;
             return res;
         }
+        public string Decompile(string indentation = "")
+        {
+            if (Value == null)
+            { return ""; }
+            return (bool)Value ? "true" : "false";
+        }
     }
 }

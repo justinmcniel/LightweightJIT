@@ -47,5 +47,24 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "")
+        {
+            if (Value == null)
+            { return "null"; }
+            
+            if (Value is bool b)
+            { return b ? "true" : "false"; }
+
+            if (Value is string s)
+            { return s; }
+
+            if (Value is int i)
+            { return i.ToString(); }
+
+            if (Value is float f)
+            { return f.ToString(); }
+
+            return "";
+        }
     }
 }

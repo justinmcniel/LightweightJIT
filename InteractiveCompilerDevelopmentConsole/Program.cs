@@ -96,7 +96,11 @@ namespace InteractiveCompilerDevelopmentConsole
             {
                 throw new Exception("Failed to compile program");
             }
-            
+
+            Console.WriteLine("Decompiling:");
+            Console.WriteLine(compiler.DecompileProgram(programID));
+            Console.WriteLine("Decompiling Complete.");
+
             MyEvent?.Invoke("Main", 68);
 
             return;

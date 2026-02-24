@@ -14,10 +14,14 @@ namespace InteractiveCompiler
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry {  get; } = [];
         public Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; } = [];
         public Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; } = [];
+        private Dictionary<Guid, ProgramToken> ProgramTokenLookupTable { get; } = [];
+
+        private event EventHandler<object?>? OnCompilationComplete;
 
         public BaseCompiler()
         {
-            //
+            VariableRegistry[Guid.Empty] = [];
+            RegisterTriggerEvent("Immediately", ref OnCompilationComplete);
         }
 
         public Guid RegisterProgram(string programBody)
@@ -35,6 +39,8 @@ namespace InteractiveCompiler
 
             CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
 
+            ProgramTokenLookupTable[program.ID] = program;
+
             List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> eventsList = [];
             throw new NotImplementedException();
 
@@ -48,8 +54,18 @@ namespace InteractiveCompiler
                 reactionList.Add((Reaction, program.ID));
             }
 
+            OnCompilationComplete?.Invoke(this, null); //will retrigger whenever a new program is registered
+
             return program.ID;
         }
+
+        public string DecompileProgram(Guid programID)
+        {
+            if(!ProgramTokenLookupTable.TryGetValue(programID, out var program))
+            { return ""; }
+            return program!.Decompile();
+        }
+
         public bool RemoveProgram(Guid programID)
         {
             bool res = false;

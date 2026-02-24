@@ -52,5 +52,17 @@ namespace InteractiveCompiler.Interpretation
 
             return null;
         }
+        public string Decompile(string indentation = "")
+        {
+            string res = "";
+            foreach(var (Conditional, Expressions) in CodeBlocks)
+            {
+                res += $"else if ({Conditional.Decompile(indentation)})\r\n{indentation}";
+                res += $"{{\r\n{indentation}\t";
+                res += Expressions.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+                res += $"}}\r\n{indentation}";
+            }
+            return res;
+        }
     }
 }
