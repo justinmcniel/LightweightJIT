@@ -1,50 +1,57 @@
 ﻿using InteractiveCompiler;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace InteractiveCompilerDevelopmentConsole
 {
     public static class Program
-    { /// TODO: Test Properties, test if elseif (no else)
+    {
         public static event EventHandler<object?>? MyEvent;
         public static event EventHandler<object?>? MyEvent2;
         public static event EventHandler<object?>? MyEvent3;
         public static event EventHandler<object?>? MyEvent4;
+        public static event EventHandler<object?>? MyEvent5;
         static string Parse(object? o) => o?.ToString() ?? "null";
+
+        private static void InterpreterLog(string s = "")
+        {
+            //Console.WriteLine(s);
+        }
 
         public static object? MyFunc(IEnumerable<object?>? args)
         {
             if (args == null)
             {
-                Console.WriteLine($"Args was null");
+                InterpreterLog($"Args was null");
                 return null;
             }
             if (args.Count() != 2)
             {
-                Console.WriteLine($"Unexpected ArgCount: {args.Count()}");
+                InterpreterLog($"Unexpected ArgCount: {args.Count()}");
                     return null;
             }
 
             object? sender = args.ElementAt(0);
             object? arg = args.ElementAt(1);
 
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered by {Parse(sender)} with an argument of {Parse(arg)}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered by {Parse(sender)} with an argument of {Parse(arg)}");
+            InterpreterLog();
             return true;
         }
 
         private static bool? returnObj1 = null;
         public static object? MyFunc2(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             if (args != null)
             {
                 foreach (var arg in args)
-                { Console.WriteLine($"Argument: {Parse(arg)}"); }
+                { InterpreterLog($"Argument: {Parse(arg)}"); }
             }
             var res = returnObj1;
-            Console.WriteLine($"Return Value: {Parse(res)}");
+            InterpreterLog($"Return Value: {Parse(res)}");
             returnObj1 = true;
-            Console.WriteLine();
+            InterpreterLog();
             return res;
         }
 
@@ -53,62 +60,62 @@ namespace InteractiveCompilerDevelopmentConsole
         public static object? MyFunc3a(IEnumerable<object?>? args)
         {
             myInt1 += 2;
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myInt1}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myInt1}");
+            InterpreterLog();
             return myInt1;
         }
 
         public static object? MyFunc3b(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myInt2}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myInt2}");
+            InterpreterLog();
             return myInt2;
         }
 
         public static object? MyFunc3c(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             if (args != null)
             {
                 foreach (var arg in args)
-                { Console.WriteLine($"Argument: {Parse(arg)}"); }
+                { InterpreterLog($"Argument: {Parse(arg)}"); }
             }
-            Console.WriteLine();
+            InterpreterLog();
             return null;
         }
 
         public static object? MyFunc3d(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog();
             return null;
         }
 
         public static object? MyFunc4a(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog();
             return null;
         }
 
         public static object? MyFunc4b(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog();
             return null;
         }
 
         public static object? MyFunc4c(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog();
             return null;
         }
 
         public static object? MyFunc4d(IEnumerable<object?>? args)
         {
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            InterpreterLog();
             return null;
         }
 
@@ -120,33 +127,59 @@ namespace InteractiveCompilerDevelopmentConsole
         public static bool MyCondFunc4a(IEnumerable<object?>? args)
         {
             myBool1 = !myBool1;
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool1}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool1}");
+            InterpreterLog();
             return myBool1;
         }
 
         public static bool MyCondFunc4b(IEnumerable<object?>? args)
         {
             myBool2 = !myBool2;
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool2}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool2}");
+            InterpreterLog();
             return myBool2;
         }
 
         public static bool MyCondFunc4c(IEnumerable<object?>? args)
         {
             myBool3 = !myBool3;
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool3}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool3}");
+            InterpreterLog();
             return myBool3;
         }
 
         public static bool MyCondFunc4d(IEnumerable<object?>? args)
         {
             myBool4 = !myBool4;
-            Console.WriteLine($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool4}");
-            Console.WriteLine();
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool4}");
+            InterpreterLog();
             return myBool4;
+        }
+
+        private static bool myBool5a = true;
+        private static bool myBool5b = true;
+
+        private static object? MyFunc5(IEnumerable<object?>? args)
+        {
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
+            myBool5b = false;
+            InterpreterLog($"Set {nameof(myBool5b)} to {myBool5b}");
+            InterpreterLog();
+            return null;
+        }
+        private static bool MyCondFunc5a(IEnumerable<object?>? args)
+        {
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool5a}");
+            InterpreterLog();
+            return myBool5a;
+        }
+
+        private static bool MyCondFunc5b(IEnumerable<object?>? args)
+        {
+            InterpreterLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myBool5b}");
+            InterpreterLog();
+            InterpreterLog();
+            return myBool5b;
         }
 
         private static void TestTrigger1()
@@ -205,6 +238,18 @@ namespace InteractiveCompilerDevelopmentConsole
             MyEvent4?.Invoke(null, null);
         }
 
+        private static void TestTrigger5()
+        {
+            /*
+             * 5a-t
+             * 5a-f, 5b-t, 5
+             * 5a-f, 5b-f
+             */
+            MyEvent5?.Invoke(null, null);
+            MyEvent5?.Invoke(null, null);
+            MyEvent5?.Invoke(null, null);
+        }
+
         public static void Main(string[] args)
         {
             DirectoryInfo? codeBaseDirectory = new(Directory.GetCurrentDirectory());
@@ -217,48 +262,71 @@ namespace InteractiveCompilerDevelopmentConsole
             if (consoleBaseDir?.Name != "InteractiveCompilerDevelopmentConsole")
             { throw new Exception("Could not find base directory"); }
             
-            string programBody = File.ReadAllText($"{consoleBaseDir.FullName}/compileTest.txt");
+            string compileTestBody = File.ReadAllText($"{consoleBaseDir.FullName}/compileTest.txt");
+            string parseTestBody = File.ReadAllText($"{consoleBaseDir.FullName}/parseTest.txt");
             BaseCompiler compiler = new();
 
-            if (!compiler.RegisterTriggerEvent("MyTrigger", ref MyEvent)) { throw new Exception("Failed to register trigger"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc), MyFunc)) { throw new Exception("Failed to register function"); }
+            if (!compiler.RegisterTriggerEvent("MyTrigger", ref MyEvent)) { throw new Exception("Failed to register trigger 1"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc), MyFunc)) { throw new Exception("Failed to register function 1"); }
 
-            if (!compiler.RegisterTriggerEvent("MyTrigger2", ref MyEvent2)) { throw new Exception("Failed to register trigger"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc2), MyFunc2)) { throw new Exception("Failed to register function"); }
+            if (!compiler.RegisterTriggerEvent("MyTrigger2", ref MyEvent2)) { throw new Exception("Failed to register trigger 2"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc2), MyFunc2)) { throw new Exception("Failed to register function 2"); }
 
-            if (!compiler.RegisterTriggerEvent("MyTrigger3", ref MyEvent3)) { throw new Exception("Failed to register trigger"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3a), MyFunc3a)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3b), MyFunc3b)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3c), MyFunc3c)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3d), MyFunc3d)) { throw new Exception("Failed to register function"); }
+            if (!compiler.RegisterTriggerEvent("MyTrigger3", ref MyEvent3)) { throw new Exception("Failed to register trigger 3"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3a), MyFunc3a)) { throw new Exception("Failed to register function 3a"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3b), MyFunc3b)) { throw new Exception("Failed to register function 3b"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3c), MyFunc3c)) { throw new Exception("Failed to register function 3c"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc3d), MyFunc3d)) { throw new Exception("Failed to register function 3d"); }
 
-            if (!compiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4)) { throw new Exception("Failed to register trigger"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4a), MyFunc4a)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4b), MyFunc4b)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4c), MyFunc4c)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4d), MyFunc4d)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4a), MyCondFunc4a)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4b), MyCondFunc4b)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4c), MyCondFunc4c)) { throw new Exception("Failed to register function"); }
-            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4d), MyCondFunc4d)) { throw new Exception("Failed to register function"); }
+            if (!compiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4)) { throw new Exception("Failed to register trigger 4"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4a), MyFunc4a)) { throw new Exception("Failed to register function 4a"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4b), MyFunc4b)) { throw new Exception("Failed to register function 4b"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4c), MyFunc4c)) { throw new Exception("Failed to register function 4c"); }
+            if (!compiler.RegisterRuntimeFunction(nameof(MyFunc4d), MyFunc4d)) { throw new Exception("Failed to register function 4d"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4a), MyCondFunc4a)) { throw new Exception("Failed to conditional register function 4a"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4b), MyCondFunc4b)) { throw new Exception("Failed to conditional register function 4b"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4c), MyCondFunc4c)) { throw new Exception("Failed to conditional register function 4c"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc4d), MyCondFunc4d)) { throw new Exception("Failed to conditional register function 4d"); }
 
-            var programID = compiler.RegisterProgram(programBody);
+            if (!compiler.RegisterTriggerEvent("MyTrigger5", ref MyEvent5)) { throw new Exception("Failed to register trigger 5"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc5", MyFunc5)) { throw new Exception("Failed to Register Function 5"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc5a), MyCondFunc5a)) { throw new Exception("Failed to register conditional function 5a"); }
+            if (!compiler.RegisterConditionalFunction(nameof(MyCondFunc5b), MyCondFunc5b)) { throw new Exception("Failed to register conditional function 5b"); }
+            if (!compiler.RegisterProperty("MyVar5", () => myBool5a, (arg) =>
+            {
+                if (arg == null) { throw new Exception("Arg was null"); }
+                if (arg is bool b) { myBool5a = b; }
+                else { throw new Exception($"Expected bool, but got {arg.GetType().Name}"); }
+            })) { throw new Exception("Failed to register property 5"); }
 
-            if (programID == Guid.Empty)
+            Stopwatch sw = Stopwatch.StartNew();
+            var compileProgramID = compiler.RegisterProgram(compileTestBody);
+            sw.Stop();
+            Console.WriteLine($"Compiled the compile test vector in {sw.ElapsedMilliseconds}ms");
+
+            if (compileProgramID == Guid.Empty)
             { throw new Exception("Failed to compile program"); }
 
-            Console.WriteLine("Decompiling:");
-            Console.WriteLine(compiler.DecompileProgram(programID));
-            Console.WriteLine("Decompiling Complete.");
-            Console.Write("Press Enter to Continue."); Console.ReadLine();
+            Console.WriteLine($"Decompiling:");
+            sw.Restart();
+            Console.WriteLine(compiler.DecompileProgram(compileProgramID));
+            sw.Stop();
+            Console.WriteLine($"Decompiling Complete in {sw.ElapsedMilliseconds}ms");
 
+            sw.Restart();
             TestTrigger1();
-            Console.Write("Press Enter to Continue."); Console.ReadLine();
             TestTrigger2();
-            Console.Write("Press Enter to Continue."); Console.ReadLine();
             TestTrigger3();
-            Console.Write("Press Enter to Continue."); Console.ReadLine();
             TestTrigger4();
+            TestTrigger5();
+            sw.Stop();
+            Console.WriteLine($"Running Complete in {sw.ElapsedMilliseconds}ms");
+
+            sw.Restart();
+            var parseProgramID = compiler.RegisterProgram(parseTestBody);
+            sw.Stop();
+            Console.WriteLine($"Compiled the parse test vector in {sw.ElapsedMilliseconds}ms");
+
 
             return;
         }

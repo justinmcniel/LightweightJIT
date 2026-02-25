@@ -23,10 +23,9 @@ namespace InteractiveCompiler
         public BaseCompiler()
         {
             VariableRegistry[Guid.Empty] = [];
-            RegisterTriggerEvent("OnCompilationComplete", ref OnCompilationComplete);
+            RegisterTriggerEvent("OnAnyCompilationComplete", ref OnCompilationComplete);
             RegisterTriggerEvent("Immediately", ref DoNotInvoke);
-            RegisterRuntimeFunction("Get", GetProperty);
-            RegisterRuntimeFunction("Set", SetProperty);
+            RegisterRuntimeFunction("Log", (args) => { if (args != null) { foreach (var arg in args) { Console.WriteLine(arg); } } return null; });
         }
 
         public Guid RegisterProgram(string programBody, object? invokingObject = null)
@@ -143,39 +142,6 @@ namespace InteractiveCompiler
         {
             BoundProperties[propertyName] = (Getter, Setter);
             return true;
-        }
-
-        private object? SetProperty(IEnumerable<object?>? args)
-        {
-            if(args != null && args.Count() == 2)
-            {
-                if (args.ElementAt(0) is string property)
-                {
-                    if (BoundProperties.TryGetValue(property, out var accessor))
-                    {
-                        accessor.Setter(args.ElementAt(1));
-                        return true;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private object? GetProperty(IEnumerable<object?>? args)
-        {
-            if(args != null && args.Count() == 1)
-            {
-                if (args.ElementAt(0) is string property)
-                {
-                    if (BoundProperties.TryGetValue(property, out var accessor))
-                    {
-                        return accessor.Getter();
-                    }
-                }
-            }
-
-            return null;
         }
 
         public Func<object?> PropertyGetter(string propertyName) => BoundProperties[propertyName].Getter;

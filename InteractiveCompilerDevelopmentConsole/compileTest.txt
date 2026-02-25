@@ -35,3 +35,19 @@ On MyTrigger4:
 	{
 		MyFunc4d();
 	}
+
+On MyTrigger5:
+	if(MyCondFunc5a())
+	{
+		let MyVar5 = false;
+	}
+	else if(MyCondFunc5b())
+	{
+		MyFunc5();
+	}
+
+On OnAnyCompilationComplete: 
+	Log("Any compilation complete.");
+
+On Immediately: 
+	Log("This Compilation Complete");
