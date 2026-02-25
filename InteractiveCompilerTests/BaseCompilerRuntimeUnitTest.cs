@@ -67,7 +67,6 @@ namespace InteractiveCompilerTests
             ProgramID = Compiler!.RegisterProgram(CompileBody, LoggingFunc: TextLog);
 
             Assert.NotEqual(Guid.Empty, ProgramID);
-            /// TODO: Check that it parsed correctly?
 
             Assert.Equal(2, TextLogEvents.Count);
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());

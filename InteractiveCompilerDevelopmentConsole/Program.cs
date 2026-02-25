@@ -8,7 +8,6 @@ namespace InteractiveCompilerDevelopmentConsole
 {
     public static class Program
     { /// TODO: Static Dispatcher
-      /// TODO: Unit Tests
         public static event EventHandler<object?>? MyEvent;
         public static event EventHandler<object?>? MyEvent2;
         public static event EventHandler<object?>? MyEvent3;
