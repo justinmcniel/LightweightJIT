@@ -91,7 +91,8 @@ namespace InteractiveCompiler.Interpretation
             }
             else if (funcCallToken != null)
             {
-                return () => funcCallToken.Compile(compiler);
+                var func = funcCallToken.Compile(compiler);
+                return () => { _ = func(); };
             }
             else if (condExpToken != null)
             {

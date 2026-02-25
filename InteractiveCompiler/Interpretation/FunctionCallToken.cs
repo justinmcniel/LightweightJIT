@@ -54,7 +54,10 @@ namespace InteractiveCompiler.Interpretation
         public Func<object?> Compile(IInteractiveCompiler compiler)
         {
             if (condFuncCall != null)
-            { return () => condFuncCall.Compile(compiler)(); }
+            {
+                var condFunc = condFuncCall.Compile(compiler);
+                return () => condFunc(); 
+            }
 
             if(funcToken == null)
             { throw new CompilerException(); }

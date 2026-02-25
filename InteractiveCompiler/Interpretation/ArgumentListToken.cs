@@ -26,11 +26,16 @@ namespace InteractiveCompiler.Interpretation
 
             return res;
         }
-        public string Decompile(string indentation = "") => String.Join(", ", Values);
+        public string Decompile(string indentation = "")
+        {
+            List<string> args = new();
+            foreach(var value in Values)
+            { args.Add(value.Decompile(indentation)); }
+            return String.Join(", ", args);
+        }
 
         public Func<IEnumerable<object?>?> Compile(IInteractiveCompiler compiler)
         {
-            Values[0].Compile(compiler);
             int len = Values.Count;
 
             Func<object?>[] Getters = new Func<object?>[len];

@@ -20,10 +20,10 @@ namespace InteractiveCompiler.Interpretation
 
             compiler.CreateVariableRegistry();
             compiler.NewVariable("triggerArgument");
+            compiler.NewVariable("triggerer");
 
             EventListToken? tmp = EventListToken.TryParse(text, ref index, compiler);
 
-            compiler.CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
             if (tmp == null)
             { return null; }
 

@@ -1,0 +1,37 @@
+On MyTrigger:
+	MyFunc(triggerer, triggerArgument);
+
+On MyTrigger2:
+	let myVar2 = MyFunc2();
+	if (myVar2 == null)
+	{
+		MyFunc2(123);
+	}
+
+On MyTrigger3:
+	if(MyFunc3a() < MyFunc3b())
+	{
+		MyFunc3c("test string");
+	}
+	else
+	{
+		MyFunc3d();
+	}
+
+On MyTrigger4:
+	if(MyCondFunc4a())
+	{
+		MyFunc4a();
+	}
+	else if(MyCondFunc4b())
+	{
+		MyFunc4b();
+	}
+	else if(MyCondFunc4c() and MyCondFunc4d())
+	{
+		MyFunc4c();
+	}
+	else
+	{
+		MyFunc4d();
+	}

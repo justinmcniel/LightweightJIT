@@ -78,7 +78,8 @@ namespace InteractiveCompiler.Interpretation
             {
                 var (Conditional, Expression) = CodeBlocks[i];
                 Conditionals[i] = Conditional.Compile(compiler);
-                Expressions[i] = () => { Expression.Compile(compiler)(null, null); };
+                var exprFunc = Expression.Compile(compiler);
+                Expressions[i] = () => { exprFunc(null, null); };
             }
 
             bool Evaluate()

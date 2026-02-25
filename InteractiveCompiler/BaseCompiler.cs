@@ -18,16 +18,18 @@ namespace InteractiveCompiler
         private Dictionary<string, (Func<object?> Getter, Action<object?> Setter)> BoundProperties { get; } = [];
 
         private event EventHandler<object?>? OnCompilationComplete;
+        private event EventHandler<object?>? DoNotInvoke;
 
         public BaseCompiler()
         {
             VariableRegistry[Guid.Empty] = [];
-            RegisterTriggerEvent("Immediately", ref OnCompilationComplete);
+            RegisterTriggerEvent("OnCompilationComplete", ref OnCompilationComplete);
+            RegisterTriggerEvent("Immediately", ref DoNotInvoke);
             RegisterRuntimeFunction("Get", GetProperty);
             RegisterRuntimeFunction("Set", SetProperty);
         }
 
-        public Guid RegisterProgram(string programBody)
+        public Guid RegisterProgram(string programBody, object? invokingObject = null)
         {
             int index = 0;
             ProgramToken? program;
@@ -40,20 +42,27 @@ namespace InteractiveCompiler
             if(index == 0 ||  program == null)
             { return Guid.Empty; }
 
-            CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
-
             ProgramTokenLookupTable[program.ID] = program;
 
             var eventsList = program.Compile(this);
 
+            CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
+
             foreach(var (Trigger, Reaction) in eventsList)
             {
-                if (!TriggerEventsRegistry.TryGetValue(Trigger, out var reactionList))
-                {
-                    reactionList = [];
-                    TriggerEventsRegistry[Trigger] = reactionList;
+                if (Trigger == "Immediately")
+                { 
+                    Reaction(invokingObject, [program.ID]); 
                 }
-                reactionList.Add((Reaction, program.ID));
+                else
+                {
+                    if (!TriggerEventsRegistry.TryGetValue(Trigger, out var reactionList))
+                    {
+                        reactionList = [];
+                        TriggerEventsRegistry[Trigger] = reactionList;
+                    }
+                    reactionList.Add((Reaction, program.ID));
+                }
             }
 
             OnCompilationComplete?.Invoke(this, null); //will retrigger whenever a new program is registered
@@ -96,6 +105,7 @@ namespace InteractiveCompiler
                 foreach(var (Reaction, ProgramID) in TriggerEventsRegistry[eventName])
                 {
                     VariableRegistry[ProgramID]["triggerArgument"] = triggerArgument;
+                    VariableRegistry[ProgramID]["triggerer"] = sender;
                     Reaction.Invoke(sender, [ProgramID]);
                 }
             };

@@ -56,7 +56,7 @@ namespace InteractiveCompiler.Interpretation
             { return b ? "true" : "false"; }
 
             if (Value is string s)
-            { return s; }
+            { return $"\"{s}\""; }
 
             if (Value is int i)
             { return i.ToString(); }

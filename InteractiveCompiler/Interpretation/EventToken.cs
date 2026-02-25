@@ -45,7 +45,7 @@ namespace InteractiveCompiler.Interpretation
         public string Decompile(string indentation = "")
         {
             string res = "";
-            res += indentation + "On " + Trigger + ": " + ExpressionList?.Decompile(indentation);
+            res += indentation + "On " + Trigger + ": \r\n\t" + ExpressionList?.Decompile(indentation);
             return res;
         }
 
