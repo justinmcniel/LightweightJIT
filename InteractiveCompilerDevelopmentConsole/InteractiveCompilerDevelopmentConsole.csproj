@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\InteractiveCompilerTests\InteractiveCompilerTests.csproj" />
       <ProjectReference Include="..\InteractiveCompiler\InteractiveCompiler.csproj" />
     </ItemGroup>
 

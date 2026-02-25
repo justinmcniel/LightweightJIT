@@ -9,7 +9,7 @@ namespace InteractiveCompiler
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry { get; }
         protected Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
 
-        public Guid RegisterProgram(string programBody, object? invokingObject = null);
+        public Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null);
         public string DecompileProgram(Guid programID);
         public bool RemoveProgram(Guid programID);
         public void ClearPrograms();

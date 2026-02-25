@@ -28,7 +28,7 @@ namespace InteractiveCompiler.Interpretation
         }
         public string Decompile(string indentation = "")
         {
-            List<string> args = new();
+            List<string> args = [];
             foreach(var value in Values)
             { args.Add(value.Decompile(indentation)); }
             return String.Join(", ", args);

@@ -19,27 +19,37 @@ namespace InteractiveCompiler
 
         private event EventHandler<object?>? OnCompilationComplete;
         private event EventHandler<object?>? DoNotInvoke;
+        private Action<string?> Log = (s) => Console.WriteLine(s);
 
         public BaseCompiler()
         {
             VariableRegistry[Guid.Empty] = [];
             RegisterTriggerEvent("OnAnyCompilationComplete", ref OnCompilationComplete);
             RegisterTriggerEvent("Immediately", ref DoNotInvoke);
-            RegisterRuntimeFunction("Log", (args) => { if (args != null) { foreach (var arg in args) { Console.WriteLine(arg); } } return null; });
+            RegisterRuntimeFunction("Log", (args) => { if (args != null) { foreach (var arg in args) { Log(arg?.ToString() ?? "null"); } } return null; });
         }
 
-        public Guid RegisterProgram(string programBody, object? invokingObject = null)
+        public Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
         {
+            Log = LoggingFunc ?? Log;
+
             int index = 0;
             ProgramToken? program;
             try
             {
                 program = ProgramToken.TryParse(programBody, ref index, this);
             }
-            catch { return Guid.Empty; }
+            catch
+            {
+                OnCompilationComplete?.Invoke(this, null);
+                return Guid.Empty; 
+            }
 
             if(index == 0 ||  program == null)
-            { return Guid.Empty; }
+            {
+                OnCompilationComplete?.Invoke(this, null);
+                return Guid.Empty; 
+            }
 
             ProgramTokenLookupTable[program.ID] = program;
 
@@ -64,7 +74,7 @@ namespace InteractiveCompiler
                 }
             }
 
-            OnCompilationComplete?.Invoke(this, null); //will retrigger whenever a new program is registered
+            OnCompilationComplete?.Invoke(this, null);
 
             return program.ID;
         }
