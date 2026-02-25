@@ -70,13 +70,13 @@ namespace InteractiveCompilerDevelopmentConsole
             sw.Stop();
             Console.WriteLine($"Decompiling Complete in {sw.ElapsedMilliseconds}ms");
 
-            /*sw.Restart();
+            sw.Restart();
             BaseCompilerRuntimeUnitTest.TestTrigger1();
             BaseCompilerRuntimeUnitTest.TestTrigger2();
             BaseCompilerRuntimeUnitTest.TestTrigger3();
             BaseCompilerRuntimeUnitTest.TestTrigger4();
             BaseCompilerRuntimeUnitTest.TestTrigger5();
-            sw.Stop();*/
+            sw.Stop();
             Console.WriteLine($"Running Complete in {sw.ElapsedMilliseconds}ms");
 
             sw.Restart();

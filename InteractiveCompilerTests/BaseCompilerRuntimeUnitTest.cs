@@ -13,7 +13,9 @@ namespace InteractiveCompilerTests
 
         [Fact]
         public static void TestInitialize()
-        { /// TODO: Figure out why it reinvokes the events if I trigger all the tests at once
+        {
+            if (!String.IsNullOrEmpty(CompileBody) && Compiler != null) { return; } // already initialize
+
             var baseDirectory = TestUtilities.FindBaseDirectory();
             CompileBody = File.ReadAllText($"{baseDirectory.FullName}/compileTest.txt");
 
@@ -55,18 +57,12 @@ namespace InteractiveCompilerTests
                 if (arg is bool b) { myBool5a = b; }
                 else { throw new Exception($"Expected bool, but got {arg.GetType().Name}"); }
             }));
-
-            TestCompile();
-            TestTrigger1();
-            TestTrigger2(); /// TODO: Remove these once I Figure out why it reinvokes the events if I trigger all the tests at once
-            TestTrigger3();
-            TestTrigger4();
-            TestTrigger5();
         }
 
-        /*[Fact]
-        public*/ static void TestCompile()
+        [Fact]
+        public static void TestCompile()
         {
+            if (ProgramID != Guid.Empty) { return; } //already compiled
             CheckInitialize(); ClearLogs();
             ProgramID = Compiler!.RegisterProgram(CompileBody, LoggingFunc: TextLog);
 
@@ -85,14 +81,14 @@ namespace InteractiveCompilerTests
 
         private static void CheckInitialize()
         {
-            if (String.IsNullOrEmpty(CompileBody) || Compiler == null || true)
+            if (String.IsNullOrEmpty(CompileBody) || Compiler == null)
             { TestInitialize(); }
         }
 
         private static void CheckSetup()
         {
             CheckInitialize();
-            if (ProgramID == Guid.Empty || true)
+            if (ProgramID == Guid.Empty)
             { TestCompile(); }
         }
 
@@ -356,8 +352,8 @@ namespace InteractiveCompilerTests
 
 
 
-        /*[Fact]
-        public*/ static void TestTrigger1()
+        [Fact]
+        public static void TestTrigger1()
         {
             CheckSetup(); ClearLogs();
             /*
@@ -391,8 +387,8 @@ namespace InteractiveCompilerTests
             Assert.Equal(true, ret);
         }
 
-        /*[Fact]
-        public*/ static void TestTrigger2()
+        [Fact]
+        public static void TestTrigger2()
         {
             CheckSetup(); ClearLogs();
             /*
@@ -437,8 +433,8 @@ namespace InteractiveCompilerTests
             Assert.Equal(true, ret);
         }
 
-        /*[Fact]
-        public*/ static void TestTrigger3()
+        [Fact]
+        public static void TestTrigger3()
         {
             CheckSetup(); ClearLogs();
             /*
@@ -504,8 +500,8 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
         }
 
-        /*[Fact]
-        public*/ static void TestTrigger4()
+        [Fact]
+        public static void TestTrigger4()
         {
             CheckSetup(); ClearLogs();
             /* expect 
@@ -747,8 +743,8 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
         }
 
-        /*[Fact]
-        public*/ static void TestTrigger5()
+        [Fact]
+        public static void TestTrigger5()
         {
             CheckSetup(); ClearLogs();
             /*
