@@ -14,6 +14,8 @@ namespace InteractiveCompiler
         private static Queue<Action> DispatchQueue { get; } = [];
 
         static StaticDispatchCompiler() => DispatchThread.Start();
+
+        public static bool IsRunning() => DispatchThread.IsAlive;
         
         static void DispatchThreadFunc(CancellationToken cancelToken)
         {
@@ -54,10 +56,10 @@ namespace InteractiveCompiler
             { waiter.WaitOne(); }
         }
         
-        public static Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
+        public static Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null, bool waitForCompletion = true)
         {
             Guid? res = null;
-            RequestDispatch(() => { res = Backer.RegisterProgram(programBody, invokingObject, LoggingFunc); });
+            RequestDispatch(() => { res = Backer.RegisterProgram(programBody, invokingObject, LoggingFunc); }, waitForCompletion);
             return res ?? Guid.Empty;
         }
 
