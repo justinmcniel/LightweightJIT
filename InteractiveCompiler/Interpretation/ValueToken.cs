@@ -14,10 +14,10 @@ namespace InteractiveCompiler.Interpretation
         public static ValueToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             int internalIndex = index;
-            ValueToken res = new();
-
-            int tmpIndex = internalIndex;
-            res.variableName = Utilities.NextTextToken(text, ref internalIndex);
+            ValueToken res = new()
+            {
+                variableName = Utilities.NextTextToken(text, ref internalIndex)
+            };
             if (String.IsNullOrEmpty(res.variableName))
             { return null; }
 
@@ -27,7 +27,7 @@ namespace InteractiveCompiler.Interpretation
                 return res;
             }
             res.variableName = null;
-            internalIndex = tmpIndex;
+            internalIndex = index;
 
             res.immediateToken = ImmediateToken.TryParse(text, ref internalIndex, compiler);
             if (res.immediateToken != null)
@@ -36,7 +36,7 @@ namespace InteractiveCompiler.Interpretation
                 return res;
             }
             //res.immediateToken = null; //implicit
-            internalIndex = tmpIndex;
+            internalIndex = index;
 
             res.funcCallToken = FunctionCallToken.TryParse(text, ref internalIndex, compiler);
             if (res.funcCallToken != null)
@@ -44,8 +44,8 @@ namespace InteractiveCompiler.Interpretation
                 index = internalIndex;
                 return res;
             }
-            //res.funcCallToken = null; //implicit and irrelevant
-            //internalIndex = tmpIndex; //implicit and irrelevant
+            //res.funcCallToken = null; //implicit
+            //internalIndex = index; //irrelevant
 
             return null;
         }

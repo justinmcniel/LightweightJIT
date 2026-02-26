@@ -20,11 +20,15 @@ namespace InteractiveCompiler.Interpretation
         private ValueComparison? valCompare;
         private BooleanImmediateToken? booleanImmediate;
         private ConditionalFunctionCallToken? condFuncCall;
+        private bool inverted = false;
 
         public static ConditionalPrimeToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {
             ConditionalPrimeToken res = new();
-            int internalIndex = index;
+            int startingIndex = index;
+
+            res.inverted = Utilities.NextTokenMatches(text, ref startingIndex, "!");
+            int internalIndex = startingIndex;
 
             res.valCompare = new()
             {
@@ -38,7 +42,7 @@ namespace InteractiveCompiler.Interpretation
                 return res;
             }
             res.valCompare = null;
-            internalIndex = index;
+            internalIndex = startingIndex;
 
             res.booleanImmediate = BooleanImmediateToken.TryParse(text, ref internalIndex, compiler);
             if (res.booleanImmediate != null)
@@ -54,43 +58,52 @@ namespace InteractiveCompiler.Interpretation
                 return res;
             }
 
+            if (res.inverted && res.valCompare != null)
+            { throw new CompilerException(); }
+
             return null;
         }
         public string Decompile(string indentation = "")
         {
+            string inversion = inverted ? "!" : "";
             if (valCompare != null)
             { 
-                return $"{valCompare.Value1!.Decompile(indentation)} " +
+                return inversion + 
+                    $"{valCompare.Value1!.Decompile(indentation)} " +
                     $"{valCompare.Comparator!.Decompile(indentation)} " +
                     $"{valCompare.Value2!.Decompile(indentation)}"; 
             }
             if (booleanImmediate != null)
-            { return booleanImmediate.Decompile(indentation); }
+            { return inversion + booleanImmediate.Decompile(indentation); }
             if(condFuncCall != null)
-            { return condFuncCall.Decompile(indentation); }
-            return "";
+            { return inversion + condFuncCall.Decompile(indentation); }
+            return inversion;
         }
 
         public Func<bool> Compile(IInteractiveCompiler compiler)
         {
+            Func<bool>? res = null;
             if (valCompare != null && valCompare.HasValue())
             {
                 var Getter1 = valCompare.Value1!.Compile(compiler);
                 var Getter2 = valCompare.Value2!.Compile(compiler);
-                return valCompare.Comparator!.Compile(compiler, Getter1, Getter2);
+                res =  valCompare.Comparator!.Compile(compiler, Getter1, Getter2);
             }
-
-            if (booleanImmediate != null)
+            else if (booleanImmediate != null)
             {
-                return booleanImmediate.Compile(compiler);
+                res =  booleanImmediate.Compile(compiler);
             }
-
-            if (condFuncCall != null)
+            else if (condFuncCall != null)
             {
-                return condFuncCall.Compile(compiler);
+                res =  condFuncCall.Compile(compiler);
             }
 
-            throw new CompilerException();
+            if (inverted && res != null)
+            {
+                return () => !res();
+            }
+
+            return res ?? throw new CompilerException();
         }
     }
 }

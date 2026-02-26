@@ -51,3 +51,13 @@ On OnAnyCompilationComplete:
 
 On Immediately: 
 	Log("This Compilation Complete");
+
+On MyTrigger6:
+	if(!MyCondFunc6())
+	{
+		MyFunc6(true);
+	}
+	if(!false)
+	{
+		MyFunc6(true);
+	}

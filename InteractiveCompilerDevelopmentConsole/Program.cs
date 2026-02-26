@@ -23,31 +23,31 @@ namespace InteractiveCompilerDevelopmentConsole
             BaseCompiler compiler = new();
 
             if (!compiler.RegisterTriggerEvent("MyTrigger", ref MyEvent)) { throw new Exception("Failed to register trigger 1"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc", TestUtilities.MyFunc)) { throw new Exception("Failed to register function 1"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc", CompileTestHelpers.MyFunc)) { throw new Exception("Failed to register function 1"); }
 
             if (!compiler.RegisterTriggerEvent("MyTrigger2", ref MyEvent2)) { throw new Exception("Failed to register trigger 2"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc2", TestUtilities.MyFunc2)) { throw new Exception("Failed to register function 2"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc2", CompileTestHelpers.MyFunc2)) { throw new Exception("Failed to register function 2"); }
 
             if (!compiler.RegisterTriggerEvent("MyTrigger3", ref MyEvent3)) { throw new Exception("Failed to register trigger 3"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc3a", TestUtilities.MyFunc3a)) { throw new Exception("Failed to register function 3a"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc3b", TestUtilities.MyFunc3b)) { throw new Exception("Failed to register function 3b"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc3c", TestUtilities.MyFunc3c)) { throw new Exception("Failed to register function 3c"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc3d", TestUtilities.MyFunc3d)) { throw new Exception("Failed to register function 3d"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc3a", CompileTestHelpers.MyFunc3a)) { throw new Exception("Failed to register function 3a"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc3b", CompileTestHelpers.MyFunc3b)) { throw new Exception("Failed to register function 3b"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc3c", CompileTestHelpers.MyFunc3c)) { throw new Exception("Failed to register function 3c"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc3d", CompileTestHelpers.MyFunc3d)) { throw new Exception("Failed to register function 3d"); }
             
             if (!compiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4)) { throw new Exception("Failed to register trigger 4"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc4a", TestUtilities.MyFunc4a)) { throw new Exception("Failed to register function 4a"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc4b", TestUtilities.MyFunc4b)) { throw new Exception("Failed to register function 4b"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc4c", TestUtilities.MyFunc4c)) { throw new Exception("Failed to register function 4c"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc4d", TestUtilities.MyFunc4d)) { throw new Exception("Failed to register function 4d"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc4a", TestUtilities.MyCondFunc4a)) { throw new Exception("Failed to conditional register function 4a"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc4b", TestUtilities.MyCondFunc4b)) { throw new Exception("Failed to conditional register function 4b"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc4c", TestUtilities.MyCondFunc4c)) { throw new Exception("Failed to conditional register function 4c"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc4d", TestUtilities.MyCondFunc4d)) { throw new Exception("Failed to conditional register function 4d"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc4a", CompileTestHelpers.MyFunc4a)) { throw new Exception("Failed to register function 4a"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc4b", CompileTestHelpers.MyFunc4b)) { throw new Exception("Failed to register function 4b"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc4c", CompileTestHelpers.MyFunc4c)) { throw new Exception("Failed to register function 4c"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc4d", CompileTestHelpers.MyFunc4d)) { throw new Exception("Failed to register function 4d"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc4a", CompileTestHelpers.MyCondFunc4a)) { throw new Exception("Failed to conditional register function 4a"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc4b", CompileTestHelpers.MyCondFunc4b)) { throw new Exception("Failed to conditional register function 4b"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc4c", CompileTestHelpers.MyCondFunc4c)) { throw new Exception("Failed to conditional register function 4c"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc4d", CompileTestHelpers.MyCondFunc4d)) { throw new Exception("Failed to conditional register function 4d"); }
 
             if (!compiler.RegisterTriggerEvent("MyTrigger5", ref MyEvent5)) { throw new Exception("Failed to register trigger 5"); }
-            if (!compiler.RegisterRuntimeFunction("MyFunc5", TestUtilities.MyFunc5)) { throw new Exception("Failed to Register Function 5"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc5a", TestUtilities.MyCondFunc5a)) { throw new Exception("Failed to register conditional function 5a"); }
-            if (!compiler.RegisterConditionalFunction("MyCondFunc5b", TestUtilities.MyCondFunc5b)) { throw new Exception("Failed to register conditional function 5b"); }
+            if (!compiler.RegisterRuntimeFunction("MyFunc5", CompileTestHelpers.MyFunc5)) { throw new Exception("Failed to Register Function 5"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc5a", CompileTestHelpers.MyCondFunc5a)) { throw new Exception("Failed to register conditional function 5a"); }
+            if (!compiler.RegisterConditionalFunction("MyCondFunc5b", CompileTestHelpers.MyCondFunc5b)) { throw new Exception("Failed to register conditional function 5b"); }
             if (!compiler.RegisterProperty("MyVar5", () => myBool5a, (arg) =>
             {
                 if (arg == null) { throw new Exception("Arg was null"); }

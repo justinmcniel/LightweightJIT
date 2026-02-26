@@ -42,7 +42,7 @@ namespace InteractiveCompiler.Interpretation
             return true;
         }
 
-        public static readonly string[] SymbolsList = [";", ":", "(", ")", "=", ",", "{", "}", "==", "!=", "<", "<=", ">", ">="];
+        public static readonly string[] SymbolsList = [";", ":", "(", ")", "=", ",", "{", "}", "==", "!=", "<", "<=", ">", ">=", "!"];
 
         public static string NextTextToken(string text, ref int index)
         {

@@ -54,6 +54,12 @@ namespace InteractiveCompiler
 
             var eventsList = program.Compile(this);
 
+            if (eventsList == null || eventsList.Count == 0)
+            {
+                OnCompilationComplete?.Invoke(this, null);
+                return Guid.Empty;
+            }
+
             return RegisterProgramHelper(invokingObject, program, eventsList);
         }
 

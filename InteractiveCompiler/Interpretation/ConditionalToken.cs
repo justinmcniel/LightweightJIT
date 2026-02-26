@@ -13,7 +13,7 @@ namespace InteractiveCompiler.Interpretation
         private ConditionalToken? value2 = null;
 
         public static ConditionalToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
-        { //780
+        {
             ConditionalToken res = new();
             int internalIndex = index;
 
