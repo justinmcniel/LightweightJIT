@@ -1,57 +1,52 @@
-using InteractiveCompiler;
-using System;
-using System.Reflection;
 using Xunit;
+using InteractiveCompiler;
+using System.Reflection;
 
 namespace InteractiveCompilerTests
 {
-    public class BaseCompilerRuntimeUnitTest
+    public class StaticDispatchCompilerTest
     {
         private static string CompileBody = "";
-        private static BaseCompiler? Compiler = null;
         private static Guid ProgramID = Guid.Empty;
 
+        private static bool _testedInitialize = false;
         [Fact]
         public static void TestInitialize()
         {
-            if (!String.IsNullOrEmpty(CompileBody) && Compiler != null) { return; } // already initialize
+            if (!String.IsNullOrEmpty(CompileBody)) { return; } // already initialize
 
             var baseDirectory = TestUtilities.FindBaseDirectory();
             CompileBody = File.ReadAllText($"{baseDirectory.FullName}/compileTest.txt");
 
-            Compiler = new BaseCompiler();
-
-            Assert.NotNull(Compiler);
-            Assert.IsType<BaseCompiler>(Compiler);
             Assert.False(String.IsNullOrEmpty(CompileBody), "Failed to load the program to test");
 
-            Assert.True(Compiler.RegisterTriggerEvent("MyTrigger", ref MyEvent));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc", MyFunc));
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger", ref MyEvent));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc", MyFunc));
+            
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger2", ref MyEvent2));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc2", MyFunc2));
 
-            Assert.True(Compiler.RegisterTriggerEvent("MyTrigger2", ref MyEvent2));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc2", MyFunc2));
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger3", ref MyEvent3));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc3a", MyFunc3a));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc3b", MyFunc3b));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc3c", MyFunc3c));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc3d", MyFunc3d));
 
-            Assert.True(Compiler.RegisterTriggerEvent("MyTrigger3", ref MyEvent3));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc3a", MyFunc3a));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc3b", MyFunc3b));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc3c", MyFunc3c));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc3d", MyFunc3d));
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc4a", MyFunc4a));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc4b", MyFunc4b));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc4c", MyFunc4c));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc4d", MyFunc4d));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc4a", MyCondFunc4a));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc4b", MyCondFunc4b));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc4c", MyCondFunc4c));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc4d", MyCondFunc4d));
 
-            Assert.True(Compiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc4a", MyFunc4a));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc4b", MyFunc4b));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc4c", MyFunc4c));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc4d", MyFunc4d));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc4a", MyCondFunc4a));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc4b", MyCondFunc4b));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc4c", MyCondFunc4c));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc4d", MyCondFunc4d));
-
-            Assert.True(Compiler.RegisterTriggerEvent("MyTrigger5", ref MyEvent5));
-            Assert.True(Compiler.RegisterRuntimeFunction("MyFunc5", MyFunc5));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc5a", MyCondFunc5a));
-            Assert.True(Compiler.RegisterConditionalFunction("MyCondFunc5b", MyCondFunc5b));
-            Assert.True(Compiler.RegisterProperty("MyVar5", () => myBool5a, (arg) =>
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger5", ref MyEvent5));
+            Assert.True(StaticDispatchCompiler.RegisterRuntimeFunction("MyFunc5", MyFunc5));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc5a", MyCondFunc5a));
+            Assert.True(StaticDispatchCompiler.RegisterConditionalFunction("MyCondFunc5b", MyCondFunc5b));
+            Assert.True(StaticDispatchCompiler.RegisterProperty("MyVar5", () => myBool5a, (arg) =>
             {
                 myBool5a = arg switch
                 {
@@ -60,14 +55,18 @@ namespace InteractiveCompilerTests
                     _ => throw new Exception($"Expected bool, but got {arg.GetType().Name}")
                 };
             }));
+            
+            _testedInitialize = true;
+            HandleDispatcherShutdown();
         }
 
+        private static bool _testedCompile = false;
         [Fact]
         public static void TestCompile()
         {
             if (ProgramID != Guid.Empty) { return; } //already compiled
             CheckInitialize(); ClearLogs();
-            ProgramID = Compiler!.RegisterProgram(CompileBody, LoggingFunc: TextLog);
+            ProgramID = StaticDispatchCompiler.RegisterProgram(CompileBody, LoggingFunc: TextLog);
 
             Assert.NotEqual(Guid.Empty, ProgramID);
 
@@ -75,15 +74,18 @@ namespace InteractiveCompilerTests
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
 
-            var tmpID = Compiler!.RegisterProgram("", LoggingFunc: TextLog);
+            var tmpID = StaticDispatchCompiler.RegisterProgram("", LoggingFunc: TextLog);
 
             Assert.Single(TextLogEvents);
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
+            
+            _testedCompile = true;
+            HandleDispatcherShutdown();
         }
 
         private static void CheckInitialize()
         {
-            if (String.IsNullOrEmpty(CompileBody) || Compiler == null)
+            if (String.IsNullOrEmpty(CompileBody))
             { TestInitialize(); }
         }
 
@@ -354,6 +356,7 @@ namespace InteractiveCompilerTests
 
 
 
+        private static bool _tested1 = false;
         [Fact]
         public static void TestTrigger1()
         {
@@ -387,8 +390,12 @@ namespace InteractiveCompilerTests
             Assert.NotNull(ret);
             Assert.IsType<bool>(ret);
             Assert.Equal(true, ret);
+            
+            _tested1 = true;
+            HandleDispatcherShutdown();
         }
 
+        private static bool _tested2 = false;
         [Fact]
         public static void TestTrigger2()
         {
@@ -433,8 +440,12 @@ namespace InteractiveCompilerTests
             Assert.True(args == null || !args.Any());
             Assert.IsType<bool>(ret);
             Assert.Equal(true, ret);
+            
+            _tested2 = true;
+            HandleDispatcherShutdown();
         }
 
+        private static bool _tested3 = false;
         [Fact]
         public static void TestTrigger3()
         {
@@ -500,8 +511,12 @@ namespace InteractiveCompilerTests
             Assert.Equal(MyFunc3d, func);
             Assert.True(args == null || !args.Any());
             Assert.Null(ret);
+            
+            _tested3 = true;
+            HandleDispatcherShutdown();
         }
 
+        private static bool _tested4 = false;
         [Fact]
         public static void TestTrigger4()
         {
@@ -743,8 +758,12 @@ namespace InteractiveCompilerTests
             Assert.Equal(MyFunc4c, func);
             Assert.True(args == null || !args.Any());
             Assert.Null(ret);
+            
+            _tested4 = true;
+            HandleDispatcherShutdown();
         }
 
+        private static bool _tested5 = false;
         [Fact]
         public static void TestTrigger5()
         {
@@ -809,6 +828,23 @@ namespace InteractiveCompilerTests
             Assert.Equal(MyCondFunc5b, funcB);
             Assert.True(args == null || !args.Any());
             Assert.False(retB);
+            
+            _tested5 = true;
+            HandleDispatcherShutdown();
+        }
+
+        private static void HandleDispatcherShutdown()
+        {
+            if (_testedInitialize &&
+                _testedCompile &&
+                _tested1 &&
+                _tested2 &&
+                _tested3 &&
+                _tested4 &&
+                _tested5)
+            {
+                StaticDispatchCompiler.Shutdown();
+            }
         }
     }
 }
