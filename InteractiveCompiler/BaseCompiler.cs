@@ -17,9 +17,9 @@ namespace InteractiveCompiler
         private Dictionary<Guid, ProgramToken> ProgramTokenLookupTable { get; } = [];
         private Dictionary<string, (Func<object?> Getter, Action<object?> Setter)> BoundProperties { get; } = [];
 
-        private event EventHandler<object?>? OnCompilationComplete;
+        public event EventHandler<object?>? OnCompilationComplete;
         private event EventHandler<object?>? DoNotInvoke;
-        private Action<string?> Log = (s) => Console.WriteLine(s);
+        public Action<string?> Log = (s) => Console.WriteLine(s);
 
         public BaseCompiler()
         {
@@ -31,7 +31,8 @@ namespace InteractiveCompiler
 
         public Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
         {
-            Log = LoggingFunc ?? Log;
+            lock (this)
+            { Log = LoggingFunc ?? Log; }
 
             int index = 0;
             ProgramToken? program;
@@ -42,69 +43,89 @@ namespace InteractiveCompiler
             catch
             {
                 OnCompilationComplete?.Invoke(this, null);
-                return Guid.Empty; 
+                return Guid.Empty;
             }
 
-            if(index == 0 ||  program == null)
+            if (index == 0 || program == null)
             {
                 OnCompilationComplete?.Invoke(this, null);
-                return Guid.Empty; 
+                return Guid.Empty;
             }
-
-            ProgramTokenLookupTable[program.ID] = program;
 
             var eventsList = program.Compile(this);
 
-            CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
+            return RegisterProgramHelper(invokingObject, program, eventsList);
+        }
 
-            foreach(var (Trigger, Reaction) in eventsList)
+        internal void CompilationCompleteSignal() => OnCompilationComplete?.Invoke(this, null);
+        internal Guid RegisterProgramHelper(object? invokingObject, ProgramToken program, List<(string Trigger, Action<object?, IEnumerable<object?>?> Reaction)> eventsList)
+        {
+            lock (this)
             {
-                if (Trigger == "Immediately")
-                { 
-                    Reaction(invokingObject, [program.ID]); 
-                }
-                else
+                ProgramTokenLookupTable[program.ID] = program;
+
+                CompilationThreadProgramLookupTable.Remove(Environment.CurrentManagedThreadId);
+
+                foreach (var (Trigger, Reaction) in eventsList)
                 {
-                    if (!TriggerEventsRegistry.TryGetValue(Trigger, out var reactionList))
+                    if (Trigger == "Immediately")
                     {
-                        reactionList = [];
-                        TriggerEventsRegistry[Trigger] = reactionList;
+                        Reaction(invokingObject, [program.ID]);
                     }
-                    reactionList.Add((Reaction, program.ID));
+                    else
+                    {
+                        if (!TriggerEventsRegistry.TryGetValue(Trigger, out var reactionList))
+                        {
+                            reactionList = [];
+                            TriggerEventsRegistry[Trigger] = reactionList;
+                        }
+                        reactionList.Add((Reaction, program.ID));
+                    }
                 }
+
+                OnCompilationComplete?.Invoke(this, null);
+
+                return program.ID;
             }
-
-            OnCompilationComplete?.Invoke(this, null);
-
-            return program.ID;
         }
 
         public string DecompileProgram(Guid programID)
         {
-            if(!ProgramTokenLookupTable.TryGetValue(programID, out var program))
-            { return ""; }
-            return program!.Decompile();
+            lock (this)
+            {
+                if (!ProgramTokenLookupTable.TryGetValue(programID, out var program))
+                { return ""; }
+                return program!.Decompile();
+            }
         }
 
         public bool RemoveProgram(Guid programID)
         {
-            bool res = false;
-            foreach (var kvp in TriggerEventsRegistry)
-            { TriggerEventsRegistry[kvp.Key] = kvp.Value.Where(set =>
+            lock (this)
             {
-                return set.ProgramID != programID;
-            }).ToList() ?? []; }
+                bool res = false;
+                foreach (var kvp in TriggerEventsRegistry)
+                {
+                    TriggerEventsRegistry[kvp.Key] = kvp.Value.Where(set =>
+                {
+                    return set.ProgramID != programID;
+                }).ToList() ?? [];
+                }
 
-            res |= VariableRegistry.Remove(programID);
-            return res;
+                res |= VariableRegistry.Remove(programID);
+                return res;
+            }
         }
         public void ClearPrograms()
         {
-            foreach (var trigger in TriggerEventsRegistry.Keys)
-            { TriggerEventsRegistry[trigger].Clear(); }
-            
-            foreach (var programID in VariableRegistry.Keys)
-            { _ = RemoveProgram(programID); }
+            lock (this)
+            {
+                foreach (var trigger in TriggerEventsRegistry.Keys)
+                { TriggerEventsRegistry[trigger].Clear(); }
+
+                foreach (var programID in VariableRegistry.Keys)
+                { _ = RemoveProgram(programID); }
+            }
         }
 
         public bool RegisterTriggerEvent(string eventName, ref EventHandler<object?>? eventHandler)
@@ -118,100 +139,190 @@ namespace InteractiveCompiler
                     Reaction.Invoke(sender, [ProgramID]);
                 }
             };
-            eventHandler += Invoker;
-            TriggerEventsRegistry[eventName] = []; // Log this?
+
+            lock (this)
+            {
+                eventHandler += Invoker;
+                TriggerEventsRegistry[eventName] = []; // Log this?
+            }
 
             return true;
         }
-        
-        public bool RemoveTriggerEvent(string eventName) => TriggerEventsRegistry.Remove(eventName);
 
-        public void ClearTriggerEvents() => TriggerEventsRegistry.Clear();
+        public bool RemoveTriggerEvent(string eventName)
+        {
+            lock (this)
+            {
+                return TriggerEventsRegistry.Remove(eventName);
+            }
+        }
+
+        public void ClearTriggerEvents()
+        {
+            lock (this)
+            {
+                TriggerEventsRegistry.Clear();
+            }
+        }
 
         public bool RegisterRuntimeFunction(string functionName, Func<IEnumerable<object?>?, object?> function)
         {
-            RuntimeFunctionRegistry[functionName] = function;
-            return true;
+            lock (this)
+            {
+                RuntimeFunctionRegistry[functionName] = function;
+                return true;
+            }
         }
 
-        public bool RemoveRuntimeFunction(string functionName) => RuntimeFunctionRegistry.Remove(functionName);
+        public bool RemoveRuntimeFunction(string functionName)
+        {
+            lock (this)
+            {
+                return RuntimeFunctionRegistry.Remove(functionName);
+            }
+        }
 
-        public void ClearRuntimeFunctions() => RuntimeFunctionRegistry.Clear();
+        public void ClearRuntimeFunctions()
+        {
+
+            lock (this)
+            {
+                RuntimeFunctionRegistry.Clear();
+            }
+        }
 
         public bool RegisterConditionalFunction(string functionName, Func<IEnumerable<object?>?, bool> function)
         {
-            ConditionalFunctionRegistry[functionName] = function;
-            return true;
+            lock (this)
+            {
+                ConditionalFunctionRegistry[functionName] = function;
+                return true;
+            }
         }
 
-        public bool RemoveConditionalFunction(string functionName) => ConditionalFunctionRegistry.Remove(functionName);
+        public bool RemoveConditionalFunction(string functionName)
+        {
+            lock (this)
+            {
+                return ConditionalFunctionRegistry.Remove(functionName);
+            }
+        }
 
-        public void ClearConditionalFunctions() => ConditionalFunctionRegistry.Clear();
+        public void ClearConditionalFunctions()
+        {
+            lock (this)
+            {
+                ConditionalFunctionRegistry.Clear();
+            }
+        }
 
         public bool RegisterProperty(string propertyName, Func<object?> Getter, Action<object?> Setter)
         {
-            BoundProperties[propertyName] = (Getter, Setter);
-            return true;
+            lock (this)
+            {
+                BoundProperties[propertyName] = (Getter, Setter);
+                return true;
+            }
         }
 
-        public Func<object?> PropertyGetter(string propertyName) => BoundProperties[propertyName].Getter;
+        public Func<object?> PropertyGetter(string propertyName)
+        {
+            lock (this)
+            {
+                return BoundProperties[propertyName].Getter;
+            }
+        }
 
-        public Action<object?> PropertySetter(string propertyName) => BoundProperties[propertyName].Setter;
+        public Action<object?> PropertySetter(string propertyName)
+        {
+            lock (this)
+            {
+                return BoundProperties[propertyName].Setter;
+            }
+        }
 
-        public bool RemoveProperty(string propertyName) => BoundProperties.Remove(propertyName);
+        public bool RemoveProperty(string propertyName)
+        {
+            lock (this)
+            {
+                return BoundProperties.Remove(propertyName);
+            }
+        }
 
-        public void ClearProperties() => BoundProperties.Clear();
+        public void ClearProperties()
+        {
+            lock (this)
+            {
+                BoundProperties.Clear();
+            }
+        }
 
         public Guid GetThreadsProgramID()
         {
-            if (!CompilationThreadProgramLookupTable.TryGetValue(Environment.CurrentManagedThreadId, out var res))
-            { return Guid.Empty; }
-            return res;
+            lock (this)
+            {
+                if (!CompilationThreadProgramLookupTable.TryGetValue(Environment.CurrentManagedThreadId, out var res))
+                { return Guid.Empty; }
+                return res;
+            }
         }
 
         public void NewVariable(string name)
         {
-            name = name.Trim();
-            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
-            { throw new CompilerException(); }
-            variableRegistry[name] = null;
+            lock (this)
+            {
+                name = name.Trim();
+                if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+                { throw new CompilerException(); }
+                variableRegistry[name] = null;
+            }
         }
 
         public bool VariableExists(string name)
         {
-            if (BoundProperties.ContainsKey(name))
-            { return true; }
-            name = name.Trim();
-            if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
-            { throw new CompilerException(); }
-            return variableRegistry.ContainsKey(name);
+            lock (this)
+            {
+                if (BoundProperties.ContainsKey(name))
+                { return true; }
+                name = name.Trim();
+                if (!VariableRegistry.TryGetValue(GetThreadsProgramID(), out var variableRegistry))
+                { throw new CompilerException(); }
+                return variableRegistry.ContainsKey(name);
+            }
         }
         public Func<object?> VariableGetter(string variableName, Guid? guid = null)
         {
-            if (BoundProperties.TryGetValue(variableName, out var property))
-            { return property.Getter; }
+            lock (this)
+            {
+                if (BoundProperties.TryGetValue(variableName, out var property))
+                { return property.Getter; }
 
-            if (guid == null)
-            { guid = GetThreadsProgramID(); }
+                if (guid == null)
+                { guid = GetThreadsProgramID(); }
 
-            if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
-            { throw new CompilerException(); }
-            return () => { return variableRegistry[variableName]; };
+                if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
+                { throw new CompilerException(); }
+                return () => { return variableRegistry[variableName]; };
+            }
         }
 
         public Action<object?> VariableSetter(string variableName, Guid? guid = null)
         {
-            if (BoundProperties.TryGetValue(variableName, out var property))
-            { return property.Setter; }
+            lock (this)
+            {
+                if (BoundProperties.TryGetValue(variableName, out var property))
+                { return property.Setter; }
 
-            if (guid == null)
-            { guid = GetThreadsProgramID(); }
+                if (guid == null)
+                { guid = GetThreadsProgramID(); }
 
-            if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
-            { throw new CompilerException(); }
-            return (object? value) => { variableRegistry[variableName] = value; };
+                if (!VariableRegistry.TryGetValue((Guid)guid, out var variableRegistry))
+                { throw new CompilerException(); }
+                return (object? value) => { variableRegistry[variableName] = value; };
+            }
         }
 
-        public void CreateVariableRegistry() => VariableRegistry[GetThreadsProgramID()] = [];
+        public void CreateVariableRegistry() 
+        { lock(this) { VariableRegistry[GetThreadsProgramID()] = []; } }
     }
 }

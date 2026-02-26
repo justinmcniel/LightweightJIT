@@ -64,6 +64,19 @@ namespace InteractiveCompilerTests
             CallOrderLog.Clear();
         }
 
+        public static void ResetTests()
+        {
+            ClearLogs();
+            ReturnObj1 = null;
+            MyInt1 = 1;
+            MyBool1 = true;
+            MyBool2 = true;
+            MyBool3 = true;
+            MyBool4 = true;
+            MyBool5a = true;
+            MyBool5b = true;
+        }
+
         public static object? MyFunc(IEnumerable<object?>? args)
         {
             if (args == null)
@@ -106,7 +119,7 @@ namespace InteractiveCompilerTests
         }
 
         public static int MyInt1 { get; set; } = 1;
-        public const int myInt2 = 4;
+        public const int MY_INT_2 = 4;
         public static object? MyFunc3a(IEnumerable<object?>? args)
         {
             MyInt1 += 2;
@@ -118,10 +131,10 @@ namespace InteractiveCompilerTests
 
         public static object? MyFunc3b(IEnumerable<object?>? args)
         {
-            TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {myInt2}");
+            TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {MY_INT_2}");
             TestLog();
-            LogCall(MyFunc3b, args, myInt2);
-            return myInt2;
+            LogCall(MyFunc3b, args, MY_INT_2);
+            return MY_INT_2;
         }
 
         public static object? MyFunc3c(IEnumerable<object?>? args)
@@ -246,6 +259,5 @@ namespace InteractiveCompilerTests
             LogCall(MyCondFunc5b, args, MyBool5b);
             return MyBool5b;
         }
-
     }
 }

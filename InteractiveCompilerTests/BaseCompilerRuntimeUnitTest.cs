@@ -3,8 +3,10 @@ using System;
 using System.Reflection;
 using Xunit;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace InteractiveCompilerTests
 {
+    [Collection("Base Compiler Test Collection")]
     [TestCaseOrderer(ordererTypeName: "InteractiveCompilerTests.PriorityOrderer", ordererAssemblyName: "InteractiveCompilerTests")]
     public class BaseCompilerRuntimeUnitTest
     {
@@ -29,6 +31,7 @@ namespace InteractiveCompilerTests
         [Fact, Priority(-2)]
         public static void TestInitialize()
         {
+            TestUtilities.ResetTests();
             var baseDirectory = TestUtilities.FindBaseDirectory();
             CompileBody = File.ReadAllText($"{baseDirectory.FullName}/compileTest.txt");
 

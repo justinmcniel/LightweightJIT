@@ -5,6 +5,7 @@ using InteractiveCompiler.Interpretation;
 
 namespace InteractiveCompilerTests
 {
+    [Collection("Static Dispatcher Test Collection")]
     [TestCaseOrderer(ordererTypeName: "InteractiveCompilerTests.PriorityOrderer", ordererAssemblyName: "InteractiveCompilerTests")]
     public class StaticDispatchCompilerTest
     {
@@ -28,6 +29,7 @@ namespace InteractiveCompilerTests
         [Fact, Priority(-2)]
         public static void TestInitialize()
         {
+            TestUtilities.ResetTests();
             var baseDirectory = TestUtilities.FindBaseDirectory();
             CompileBody = File.ReadAllText($"{baseDirectory.FullName}/compileTest.txt");
 
@@ -70,13 +72,27 @@ namespace InteractiveCompilerTests
             }));
         }
 
+        public static readonly TimeSpan CompilationTimeLimit = new(0, 10, 0);
+
         [Fact, Priority(-1)]
         public static void TestCompile()
         {
             TestUtilities.ClearLogs();
-            ProgramID = StaticDispatchCompiler.RegisterProgram(CompileBody, LoggingFunc: TextLog);
+            var compilationTask = StaticDispatchCompiler.RegisterProgram(CompileBody, LoggingFunc: TextLog);
+            var status = compilationTask.Status;
+            Assert.True(status == TaskStatus.WaitingToRun ||
+                        status == TaskStatus.Running ||
+                        status == TaskStatus.WaitingForChildrenToComplete ||
+                        status == TaskStatus.RanToCompletion);
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable xUnit1031 // Do not use blocking task operations in test method
+            Assert.True(compilationTask.Wait(CompilationTimeLimit));
+            Assert.True(compilationTask.IsCompletedSuccessfully);
+            ProgramID = compilationTask.Result;
             Assert.NotEqual(Guid.Empty, ProgramID);
+#pragma warning restore xUnit1031 // Do not use blocking task operations in test method
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
             Assert.Equal(2, TextLogEvents.Count);
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());
@@ -548,8 +564,7 @@ namespace InteractiveCompilerTests
         [Fact, Priority(int.MaxValue)]
         public static void TestShutdown()
         {
-            StaticDispatchCompiler.Shutdown();
-            Thread.Sleep(100); //some time to allow it to shut down
+            StaticDispatchCompiler.Shutdown(millisTimeout: 100);
             Assert.False(StaticDispatchCompiler.IsRunning());
         }
     }

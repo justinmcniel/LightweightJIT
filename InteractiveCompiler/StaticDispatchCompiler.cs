@@ -1,3 +1,5 @@
+using InteractiveCompiler.Interpretation;
+
 namespace InteractiveCompiler
 {
     public static class StaticDispatchCompiler
@@ -39,7 +41,12 @@ namespace InteractiveCompiler
             DispatchSem.Dispose();
         }
 
-        public static void Shutdown() => Canceller.Cancel();
+        public static void Shutdown(int millisTimeout = 0)
+        {
+            Canceller.Cancel();
+            if (millisTimeout > 0)
+            { DispatchThread.Join(millisTimeout); }
+        }
 
         private static void RequestDispatch(Action request, bool waitForCompletion = true)
         {
@@ -56,11 +63,45 @@ namespace InteractiveCompiler
             { waiter.WaitOne(); }
         }
         
-        public static Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null, bool waitForCompletion = true)
+        public static Task<Guid> RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
         {
+            /*
             Guid? res = null;
-            RequestDispatch(() => { res = Backer.RegisterProgram(programBody, invokingObject, LoggingFunc); }, waitForCompletion);
+            RequestDispatch(() => { res = Backer.RegisterProgram(programBody, invokingObject, LoggingFunc); });
             return res ?? Guid.Empty;
+            */
+            Task<Guid> compilationTask = new(() =>
+            {
+                lock (Backer)
+                { Backer.Log = LoggingFunc ?? Backer.Log; }
+
+                int index = 0;
+                ProgramToken? program;
+                try
+                {
+                    program = ProgramToken.TryParse(programBody, ref index, Backer);
+                }
+                catch
+                {
+                    Backer.CompilationCompleteSignal();
+                    return Guid.Empty;
+                }
+
+                if (index == 0 || program == null)
+                {
+                    Backer.CompilationCompleteSignal();
+                    return Guid.Empty;
+                }
+
+                var eventsList = program.Compile(Backer);
+
+                Guid? res = null;
+                RequestDispatch(() => res = Backer.RegisterProgramHelper(invokingObject, program, eventsList));
+                return res ?? Guid.Empty;
+            });
+
+            compilationTask.Start();
+            return compilationTask;
         }
 
         public static string DecompileProgram(Guid programID)
