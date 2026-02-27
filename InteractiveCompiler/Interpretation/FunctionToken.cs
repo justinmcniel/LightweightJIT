@@ -8,7 +8,7 @@ namespace InteractiveCompiler.Interpretation
 {
     internal class FunctionToken
     {
-        private string? funcName = null;
+        public string? funcName = null;
         private Func<IEnumerable<object?>?, object?>? func;
         public static FunctionToken? TryParse(string text, ref int index, IInteractiveCompiler compiler)
         {

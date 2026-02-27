@@ -1,6 +1,7 @@
 ﻿using InteractiveCompiler.Interpretation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,20 +20,28 @@ namespace InteractiveCompiler
 
         public event EventHandler<object?>? OnCompilationComplete;
         private event EventHandler<object?>? DoNotInvoke;
-        public Action<string?> Log = (s) => Console.WriteLine(s);
+        public Action<string?> InternalLog = (s) => Console.WriteLine(s);
+        public Action<string?> ErrorLog = (s) => Debug.WriteLine(s);
+
+        public void Log(object? s) => InternalLog(s?.ToString() ?? "null");
+        public void LogError(object? s) => ErrorLog(s?.ToString() ?? "null");
 
         public BaseCompiler()
         {
             VariableRegistry[Guid.Empty] = [];
             RegisterTriggerEvent("OnAnyCompilationComplete", ref OnCompilationComplete);
             RegisterTriggerEvent("Immediately", ref DoNotInvoke);
-            RegisterRuntimeFunction("Log", (args) => { if (args != null) { foreach (var arg in args) { Log(arg?.ToString() ?? "null"); } } return null; });
+            RegisterRuntimeFunction("Log", (args) => { if (args != null) { foreach (var arg in args) { Log(arg); } } return null; });
         }
 
-        public Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
+        public Guid RegisterProgram(string programBody, object? invokingObject = null,
+            Action<string?>? LoggingFunc = null, Action<string?> ? ErrorFunc = null)
         {
             lock (this)
-            { Log = LoggingFunc ?? Log; }
+            { 
+                InternalLog = LoggingFunc ?? InternalLog;
+                ErrorLog = ErrorFunc ?? ErrorLog; 
+            }
 
             int index = 0;
             ProgramToken? program;
@@ -275,6 +284,8 @@ namespace InteractiveCompiler
 
         public void NewVariable(string name)
         {
+            if (String.IsNullOrEmpty(name))
+            { throw new CompilerException(); }
             lock (this)
             {
                 name = name.Trim();

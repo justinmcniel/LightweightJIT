@@ -30,6 +30,7 @@ namespace InteractiveCompiler.Interpretation
                         if (nextEventStart >= text.Length)
                         { break; }
 
+                        compiler.LogError("Fast Forwarding to next event.");
                         internalIndex = nextEventStart;
                     }
                     else
@@ -38,7 +39,7 @@ namespace InteractiveCompiler.Interpretation
                     }
                 }
                 catch (IndexOutOfRangeException) { break; }
-                catch (CompilerException) { internalIndex++; } //ignore, and try to find the next Event
+                catch (CompilerException) { internalIndex = Utilities.NextInstanceOf(text, internalIndex + 1, "On"); } //ignore, and try to find the next Event
             }
 
             if (res.Events.Count == 0)

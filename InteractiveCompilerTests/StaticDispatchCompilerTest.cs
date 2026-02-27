@@ -2,6 +2,7 @@ using Xunit;
 using InteractiveCompiler;
 using System.Reflection;
 using InteractiveCompiler.Interpretation;
+using System.Diagnostics;
 
 namespace InteractiveCompilerTests
 {

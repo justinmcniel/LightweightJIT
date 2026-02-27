@@ -10,7 +10,7 @@ namespace InteractiveCompiler.Interpretation
     {
         private List<(ConditionalToken Conditional, ExpressionListToken Expressions)> CodeBlocks { get; } = [];
 
-        private static bool BeginningMatches(string text, ref int index)
+        private static bool? BeginningMatches(string text, ref int index, IInteractiveCompiler compiler)
         {
             bool else_present = Utilities.NextTokenMatches(text, ref index, "else");
             var tmpIndex = index;
@@ -18,6 +18,13 @@ namespace InteractiveCompiler.Interpretation
             bool whiteSpace_present = tmpIndex != index;
             bool if_present = Utilities.NextTokenMatches(text, ref index, "if");
             bool oParen_present = Utilities.NextTokenMatches(text, ref index, "(");
+            if (!oParen_present && else_present && whiteSpace_present && if_present)
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, index)} " +
+                    $"Was expecting {Utilities.ReadableSymbol("(")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, index)} instead");
+                return null;
+            }
             return else_present && whiteSpace_present && if_present && oParen_present;
         }
 
@@ -26,8 +33,9 @@ namespace InteractiveCompiler.Interpretation
             ElseIfExpressionToken res = new();
             int internalIndex = index;
 
+            bool errorlessBeginning = true;
             int elseifIndex = internalIndex;
-            while (BeginningMatches(text, ref elseifIndex))
+            while (BeginningMatches(text, ref elseifIndex, compiler) ?? (errorlessBeginning = false))
             {
                 ConditionalToken? cond = ConditionalToken.TryParse(text, ref elseifIndex, compiler);
                 if(cond != null && Utilities.NextTokenMatches(text, ref elseifIndex, ")"))
@@ -40,9 +48,35 @@ namespace InteractiveCompiler.Interpretation
                             res.CodeBlocks.Add((cond, expressions));
                             internalIndex = elseifIndex;
                         }
+                        else if (expressions != null)
+                        {
+                            compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                                $"Was expecting {Utilities.ReadableSymbol("}")}, " +
+                                $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                            return null;
+                        }
+                        else
+                        { return null; }
+                    }
+                    else
+                    {
+                        compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                            $"Was expecting {Utilities.ReadableSymbol("{")}, " +
+                            $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                        return null;
                     }
                 }
+                else
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting {Utilities.ReadableSymbol(")")}, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                    return null;
+                }
             }
+
+            if(!errorlessBeginning)
+            { return null; }
 
             if (res.CodeBlocks.Count > 0)
             {

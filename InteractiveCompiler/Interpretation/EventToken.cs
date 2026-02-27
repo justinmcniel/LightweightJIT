@@ -17,17 +17,34 @@ namespace InteractiveCompiler.Interpretation
             int internalIndex = index;
 
             if (!Utilities.NextTokenMatches(text, ref internalIndex, "On"))
-            { return null; }
+            {
+                Utilities.SkipWhitespace(text, ref internalIndex);
+                if (internalIndex < text.Length)
+                {
+                    compiler.LogError($"{Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting \"On\", " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                }
+                return null; 
+            }
 
             int tmpIndex = internalIndex;
             string triggerName = Utilities.NextTextToken(text, ref internalIndex);
             if (tmpIndex == internalIndex || triggerName == "") { return null; }
 
             if (!compiler.TriggerEventsRegistry.ContainsKey(triggerName))
-            { throw new CompilerException($"Failed To find Trigger called {triggerName}"); }
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} Failed To find Trigger called {triggerName}");
+                throw new CompilerException($"Failed To find Trigger called {triggerName}"); 
+            }
 
             if (!Utilities.NextTokenMatches(text, ref internalIndex, ":"))
-            { return null; }
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    $"Was expecting{Utilities.ReadableSymbol(":")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                return null; 
+            }
 
             EventToken res = new()
             {

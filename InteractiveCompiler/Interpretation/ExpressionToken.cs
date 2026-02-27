@@ -33,7 +33,28 @@ namespace InteractiveCompiler.Interpretation
                             index = internalIndex;
                             return res;
                         }
+                        else
+                        {
+                            compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                                $"Was expecting {Utilities.ReadableSymbol(";")}, " +
+                                $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                            return null;
+                        }
                     }
+                }
+                else if(String.IsNullOrEmpty(varName))
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting a variable name, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                    return null;
+                }
+                else
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting {Utilities.ReadableSymbol("=")}, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead.");
+                    return null;
                 }
             }
             res.valueToken = null;
@@ -46,6 +67,13 @@ namespace InteractiveCompiler.Interpretation
                 {
                     index = internalIndex;
                     return res;
+                }
+                else
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting {Utilities.ReadableSymbol(";")}, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                    return null;
                 }
             }
             res.funcCallToken = null;

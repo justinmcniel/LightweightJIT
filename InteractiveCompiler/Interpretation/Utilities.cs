@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,54 @@ namespace InteractiveCompiler.Interpretation
             }
             catch (IndexOutOfRangeException) 
             { return; }
+        }
+
+        public static string NextTokenReadable(string text, int index)
+        {
+            foreach(var symbol in SymbolsList)
+            {
+                if (NextTokenMatches(text, ref index, symbol))
+                {
+                    return ReadableSymbol(symbol);
+                }
+            }
+
+            var res = NextTextToken(text, ref index);
+            if (String.IsNullOrEmpty(res))
+            { res = "END OF FILE"; }
+            return res;
+        }
+
+        public static string ReadableSymbol(string symbol)
+        {
+            return $"{SymbolNames[symbol]} ({symbol})";
+        }
+
+        public static string GetPosition(string text, int index)
+        {
+            int line = 1;
+            int pos = 0;
+            int counter = 0;
+
+            SkipWhitespace(text, ref index);
+
+            foreach (var c in text)
+            {
+                pos++;
+
+                if(c == '\n')
+                {
+                    line++;
+                    pos = 0;
+                }
+
+                counter++;
+                if (counter >= index)
+                { break; }
+            }
+            if (line == 11)
+            { Console.WriteLine(); }
+            return $"{line}:{pos}";
         }
 
         public static bool NextTokenMatches(string text, ref int index, string token, bool caseSensitive = true)
@@ -43,6 +92,24 @@ namespace InteractiveCompiler.Interpretation
         }
 
         public static readonly string[] SymbolsList = [";", ":", "(", ")", "=", ",", "{", "}", "==", "!=", "<", "<=", ">", ">=", "!"];
+        public static readonly Dictionary<string, string> SymbolNames = new()
+        {
+            {";", "SEMICOLON"},
+            {":", "COLON"},
+            {"(", "OPEN_PARENTHASES"},
+            {")", "CLOSE_PARENTHASES"},
+            {"=", "EQUALS_SIGN"},
+            {",", "COMMA"},
+            {"{", "OPEN_CURLY_BRACES"},
+            {"}", "CLOSE_CURLY_BRACES"},
+            {"==", "EQUALS_COMPARATOR"},
+            {"!=", "NOT_EQUALS_COMPARATOR"},
+            {"<", "LEFT_CARRET"},
+            {"<=", "LESS_THAN_OR_EQUAL_TO_COMPARATOR"},
+            {">", "RIGHT_CARRET"},
+            {">=", "GREATER_THAN_OR_EQUAL_TO_COMPARATOR"},
+            {"!", "EXCLAMATION_POINT"},
+        };
 
         public static string NextTextToken(string text, ref int index)
         {

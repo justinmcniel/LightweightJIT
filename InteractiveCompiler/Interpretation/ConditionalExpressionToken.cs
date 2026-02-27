@@ -17,28 +17,52 @@ namespace InteractiveCompiler.Interpretation
             ConditionalExpressionToken res = new();
             int internalIndex = index;
 
-            if (!Utilities.NextTokenMatches(text, ref internalIndex, "if")) { return null; }
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, "if")) { return null;  }
 
-            if (!Utilities.NextTokenMatches(text, ref internalIndex, "(")) { return null; }
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, "("))
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    $"Was expecting {Utilities.ReadableSymbol(")")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                return null; 
+            }
 
             res.ifConditionalToken = ConditionalToken.TryParse(text, ref internalIndex, compiler);
             if (res.ifConditionalToken == null) { return null; }
 
-            if (!Utilities.NextTokenMatches(text, ref internalIndex, ")")) { return null; }
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, ")"))
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    $"Was expecting {Utilities.ReadableSymbol(")")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                return null; 
+            }
 
-            if (!Utilities.NextTokenMatches(text, ref internalIndex, "{")) { return null; }
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, "{"))
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    $"Was expecting {Utilities.ReadableSymbol("{")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                return null; 
+            }
 
             res.ifExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler);
             if(res.ifExpressionList == null) { return null; }
 
-            if (!Utilities.NextTokenMatches(text, ref internalIndex, "}")) { return null; }
+            if (!Utilities.NextTokenMatches(text, ref internalIndex, "}"))
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    $"Was expecting {Utilities.ReadableSymbol("}")}, " +
+                    $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                return null; 
+            }
 
             res.elseIfExpressionToken = ElseIfExpressionToken.TryParse(text, ref internalIndex, compiler);
 
             int elseIndex = internalIndex;
             if(Utilities.NextTokenMatches(text, ref elseIndex, "else"))
             {
-                if(Utilities.NextTokenMatches(text, ref elseIndex, "{"))
+                if (Utilities.NextTokenMatches(text, ref elseIndex, "{"))
                 {
                     res.elseExpressionList = ExpressionListToken.TryParse(text, ref elseIndex, compiler);
                     if (res.elseExpressionList != null)
@@ -50,8 +74,19 @@ namespace InteractiveCompiler.Interpretation
                         else
                         {
                             res.elseExpressionList = null;
+                            compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                                $"Was expecting {Utilities.ReadableSymbol("}")}, " +
+                                $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                            return null;
                         }
                     }
+                }
+                else
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting {Utilities.ReadableSymbol("{")}, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                    return null;
                 }
             }
 

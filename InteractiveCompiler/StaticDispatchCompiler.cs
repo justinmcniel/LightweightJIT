@@ -63,7 +63,8 @@ namespace InteractiveCompiler
             { waiter.WaitOne(); }
         }
         
-        public static Task<Guid> RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null)
+        public static Task<Guid> RegisterProgram(string programBody, object? invokingObject = null,
+            Action<string?>? LoggingFunc = null, Action<string?> ? ErrorFunc = null)
         {
             /*
             Guid? res = null;
@@ -73,7 +74,10 @@ namespace InteractiveCompiler
             Task<Guid> compilationTask = new(() =>
             {
                 lock (Backer)
-                { Backer.Log = LoggingFunc ?? Backer.Log; }
+                { 
+                    Backer.InternalLog = LoggingFunc ?? Backer.InternalLog; 
+                    Backer.ErrorLog = ErrorFunc ?? Backer.ErrorLog; 
+                }
 
                 int index = 0;
                 ProgramToken? program;

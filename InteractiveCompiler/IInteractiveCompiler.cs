@@ -9,7 +9,8 @@ namespace InteractiveCompiler
         public Dictionary<string, Func<IEnumerable<object?>?, bool>> ConditionalFunctionRegistry { get; }
         protected Dictionary<Guid, Dictionary<string, object?>> VariableRegistry { get; }
 
-        public Guid RegisterProgram(string programBody, object? invokingObject = null, Action<string?>? LoggingFunc = null);
+        public Guid RegisterProgram(string programBody, object? invokingObject = null, 
+            Action<string?>? LoggingFunc = null, Action<string?>? ErrorFunc = null);
         public string DecompileProgram(Guid programID);
         public bool RemoveProgram(Guid programID);
         public void ClearPrograms();
@@ -39,5 +40,8 @@ namespace InteractiveCompiler
         internal Func<object?> VariableGetter(string variableName, Guid? guid = null);
         internal Action<object?> VariableSetter(string variableName, Guid? guid = null);
         internal void CreateVariableRegistry();
+
+        internal void Log(object? s);
+        internal void LogError(object? s);
     }
 }

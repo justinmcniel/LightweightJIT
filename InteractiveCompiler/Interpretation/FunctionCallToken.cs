@@ -29,7 +29,21 @@ namespace InteractiveCompiler.Interpretation
                             index = internalIndex;
                             return res;
                         }
+                        else
+                        {
+                            compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                                $"Was expecting {Utilities.ReadableSymbol(")")}, " +
+                                $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                            return null;
+                        }
                     }
+                }
+                else if (!compiler.VariableExists(res.funcToken.funcName ?? ""))
+                {
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Was expecting {Utilities.ReadableSymbol("(")}, " +
+                        $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                    return null;
                 }
             }
 

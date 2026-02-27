@@ -59,7 +59,11 @@ namespace InteractiveCompiler.Interpretation
             }
 
             if (res.inverted && res.valCompare != null)
-            { throw new CompilerException(); }
+            {
+                compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                    "Cannot invert a value comparison, consider using the inverted operator");
+                return null;
+            }
 
             return null;
         }

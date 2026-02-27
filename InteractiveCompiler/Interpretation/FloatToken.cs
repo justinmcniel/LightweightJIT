@@ -24,6 +24,13 @@ namespace InteractiveCompiler.Interpretation
                     {
                         res.Value = float.Parse($"{d1.Value}.{d2.Value}");
                     }
+                    else
+                    {
+                        compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                            $"Was expecting NUMERIC, " +
+                            $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
+                        return null;
+                    }
                 }
             }
 

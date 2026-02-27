@@ -61,7 +61,7 @@ namespace InteractiveCompilerTests
             ClearLogs();
 
             Compile();
-
+            var tmp = TextLogEvents;
             Assert.Equal(2, TextLogEvents.Count);
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
