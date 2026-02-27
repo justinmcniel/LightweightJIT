@@ -66,11 +66,6 @@ namespace InteractiveCompiler
         public static Task<Guid> RegisterProgram(string programBody, object? invokingObject = null,
             Action<string?>? LoggingFunc = null, Action<string?> ? ErrorFunc = null)
         {
-            /*
-            Guid? res = null;
-            RequestDispatch(() => { res = Backer.RegisterProgram(programBody, invokingObject, LoggingFunc); });
-            return res ?? Guid.Empty;
-            */
             Task<Guid> compilationTask = new(() =>
             {
                 lock (Backer)

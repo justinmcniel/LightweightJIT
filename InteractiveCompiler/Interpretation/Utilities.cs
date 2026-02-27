@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,6 +10,7 @@ namespace InteractiveCompiler.Interpretation
 {
     public static class Utilities
     {
+
         public static void SkipWhitespace(string text, ref int index)
         {
             try
@@ -148,6 +150,50 @@ namespace InteractiveCompiler.Interpretation
             }
             catch (IndexOutOfRangeException)
             { return text.Length; }
+        }
+
+        public static char? GetEscapeCharacter(string text, ref int index)
+        {
+            if (text[index] != '\\')
+            { return null; }
+
+            char? ErrorHandler(ref int i)
+            { i -= 2; throw new InvalidDataException(); }
+
+            char? HexHandler(ref int i)
+            {
+                if (!Char.IsAsciiHexDigit(text[i]))
+                { return null; }
+
+                if (Char.IsAsciiHexDigit(text[i + 1]))
+                {
+                    i += 2;
+                    return (char?)Convert.ToInt16(text[(i - 2)..i], 16);
+                }
+                else
+                {
+                    i++;
+                    return (char?)Convert.ToInt16($"{text[i - 1]}", 16);
+                }
+            }
+
+            index++;
+            return text[index++] switch
+            {
+                '\\' => '\\',
+                '\'' => '\'',
+                '\"' => '\"',
+                'r' => '\r',
+                'n' => '\n',
+                't' => '\t',
+                '0' => '\0',
+                'a' => '\a',
+                'b' => '\b',
+                'f' => '\f',
+                'v' => '\v',
+                'x' => HexHandler(ref index),
+                _ => ErrorHandler(ref index)
+            };
         }
     }
 }

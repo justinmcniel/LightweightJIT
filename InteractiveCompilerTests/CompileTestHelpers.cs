@@ -61,7 +61,7 @@ namespace InteractiveCompilerTests
             ClearLogs();
 
             Compile();
-            var tmp = TextLogEvents;
+
             Assert.Equal(2, TextLogEvents.Count);
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
@@ -324,7 +324,7 @@ namespace InteractiveCompilerTests
             var arg0 = args.ElementAt(0);
             Assert.NotNull(arg0);
             Assert.IsType<string>(arg0);
-            Assert.Equal("test string", arg0);
+            Assert.Equal("Hello world!\n\tThis is a test stringg\b\x12\x3", arg0);
             Assert.Null(ret);
 
 

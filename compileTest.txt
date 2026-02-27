@@ -11,7 +11,7 @@ On MyTrigger2:
 On MyTrigger3:
 	if(MyFunc3a() < MyFunc3b())
 	{
-		MyFunc3c("test string");
+		MyFunc3c("Hello world!\n\tThis is a test stringg\b\x12\x3");
 	}
 	else
 	{

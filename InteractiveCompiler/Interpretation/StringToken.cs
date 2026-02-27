@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace InteractiveCompiler.Interpretation
 {
@@ -20,8 +21,15 @@ namespace InteractiveCompiler.Interpretation
                 try
                 {
                     while (text[internalIndex] != '"')
-                    { res.Value += text[internalIndex++]; }
+                    { res.Value += Utilities.GetEscapeCharacter(text, ref internalIndex) ?? text[internalIndex++]; }
                     internalIndex++; //move past the '"'
+                }
+                catch (InvalidDataException)
+                {
+                    internalIndex++;
+                    compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
+                        $"Unknown escape character \"\\{text[internalIndex]}\"");
+                    return null;
                 }
                 catch (IndexOutOfRangeException)
                 { return null; }
