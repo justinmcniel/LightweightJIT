@@ -8,7 +8,7 @@ namespace InteractiveCompiler.Interpretation
 {
     internal class ElseIfExpressionToken
     {
-        private List<(ConditionalToken Conditional, ExpressionListToken Expressions)> CodeBlocks { get; } = [];
+        private List<(ConditionalToken Conditional, ExpressionListToken? Expressions)> CodeBlocks { get; } = [];
 
         private static bool? BeginningMatches(string text, ref int index, IInteractiveCompiler compiler)
         {
@@ -43,20 +43,18 @@ namespace InteractiveCompiler.Interpretation
                     if (Utilities.NextTokenMatches(text, ref elseifIndex, "{"))
                     {
                         ExpressionListToken? expressions = ExpressionListToken.TryParse(text, ref elseifIndex, compiler);
-                        if (expressions != null && Utilities.NextTokenMatches(text, ref elseifIndex, "}"))
+                        if (Utilities.NextTokenMatches(text, ref elseifIndex, "}"))
                         {
                             res.CodeBlocks.Add((cond, expressions));
                             internalIndex = elseifIndex;
                         }
-                        else if (expressions != null)
+                        else
                         {
                             compiler.LogError($"ERROR: {Utilities.GetPosition(text, internalIndex)} " +
                                 $"Was expecting {Utilities.ReadableSymbol("}")}, " +
                                 $"but got {Utilities.NextTokenReadable(text, internalIndex)} instead");
                             return null;
                         }
-                        else
-                        { return null; }
                     }
                     else
                     {
@@ -93,7 +91,8 @@ namespace InteractiveCompiler.Interpretation
             {
                 res += $"else if ({Conditional.Decompile(indentation)})\r\n{indentation}";
                 res += $"{{\r\n{indentation}\t";
-                res += Expressions.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+                if (Expressions != null)
+                { res += Expressions.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}"; }
                 res += $"}}\r\n{indentation}";
             }
             return res;
@@ -112,7 +111,7 @@ namespace InteractiveCompiler.Interpretation
             {
                 var (Conditional, Expression) = CodeBlocks[i];
                 Conditionals[i] = Conditional.Compile(compiler);
-                var exprFunc = Expression.Compile(compiler);
+                var exprFunc = Expression?.Compile(compiler) ?? ((sender, environment) => { });
                 Expressions[i] = () => { exprFunc(null, null); };
             }
 

@@ -7,7 +7,7 @@ using InteractiveCompiler.Interpretation;
 namespace InteractiveCompilerDevelopmentConsole
 {
     public static class Program
-    { /// TODO: Static Dispatcher
+    {
         public static event EventHandler<object?>? MyEvent;
         public static event EventHandler<object?>? MyEvent2;
         public static event EventHandler<object?>? MyEvent3;

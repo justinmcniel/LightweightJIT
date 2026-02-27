@@ -17,11 +17,9 @@
     <AssemblyVersion>$(PackageVersion)</AssemblyVersion>
     <FileVersion>$(PackageVersion)</FileVersion>
     <PackageTags>JIT;.NET;</PackageTags>
-    <Version>1.5.1</Version>
-    <PackageReleaseNotes>Added StaticdispatchCompiler
-Added Inversion for some bools
-Added ErrorLogging
-Added UnitTests</PackageReleaseNotes>
+    <Version>1.6.0</Version>
+    <PackageReleaseNotes>Made the Expression lists inside of the block for a conditional optional
+</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -54,6 +54,10 @@ namespace InteractiveCompilerTests
 
             Assert.True(RuntimeRegisterer("MyFunc6", MyFunc6));
             Assert.True(ConditionalRegisterer("MyCondFunc6", MyCondFunc6));
+
+            Assert.True(ConditionalRegisterer("MyCondFunc7a", MyCondFunc7a));
+            Assert.True(ConditionalRegisterer("MyCondFunc7b", MyCondFunc7b));
+            Assert.True(ConditionalRegisterer("MyCondFunc7c", MyCondFunc7c));
         }
 
         public static void BaseCompile(Action Compile, Action EmptyRegisterer)
@@ -127,6 +131,9 @@ namespace InteractiveCompilerTests
             MyBool4 = true;
             MyBool5a = true;
             MyBool5b = true;
+            MyBool7a = false;
+            MyBool7b = false;
+            MyBool7c = false;
         }
 
         public static object? MyFunc(IEnumerable<object?>? args)
@@ -888,6 +895,119 @@ namespace InteractiveCompilerTests
             Assert.IsType<bool>(args.ElementAt(0));
             Assert.Equal(true, args.ElementAt(0));
             Assert.Null(ret);
+        }
+
+        public static bool MyBool7a { get; set; } = false; 
+        public static bool MyCondFunc7a(IEnumerable<object?>? args)
+        {
+            LogCall(MyCondFunc7a, args, MyBool7a);
+            return MyBool7a;
+        }
+
+        public static bool MyBool7b { get; set; } = false;
+        public static bool MyCondFunc7b(IEnumerable<object?>? args)
+        {
+            LogCall(MyCondFunc7b, args, MyBool7b);
+            return MyBool7b;
+        }
+
+        public static bool MyBool7c { get; set; } = false;
+        public static bool MyCondFunc7c(IEnumerable<object?>? args)
+        {
+            LogCall(MyCondFunc7c, args, MyBool7c);
+            return MyBool7b;
+        }
+
+        public static void TestTrigger7(Action<object?, object?> event7)
+        {
+            ClearLogs();
+            /*
+             * MyCondFunc7a-f, MyCondFunc7b-f, MyCondFunc7c-f
+             * MyCondFunc7a-f, MyCondFunc7b-f, MyCondFunc7c-t
+             * MyCondFunc7a-f, MyCondFunc7b-t
+             * MyCondFunc7a-t
+             */
+
+            event7?.Invoke(null, null);
+            Assert.Equal(3, CallOrderLog.Count);
+            Assert.Empty(RuntimeCallLog);
+            Assert.Empty(TextLogEvents);
+            Assert.Equal(3, CondCallLog.Count);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            var (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7a, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7b, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7c, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            MyBool7c = true;
+            event7?.Invoke(null, null);
+            Assert.Equal(3, CallOrderLog.Count);
+            Assert.Empty(RuntimeCallLog);
+            Assert.Empty(TextLogEvents);
+            Assert.Equal(3, CondCallLog.Count);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7a, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7b, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7c, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.True(retB);
+
+            MyBool7b = true;
+            event7?.Invoke(null, null);
+            Assert.Equal(2, CallOrderLog.Count);
+            Assert.Empty(RuntimeCallLog);
+            Assert.Empty(TextLogEvents);
+            Assert.Equal(2, CondCallLog.Count);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7a, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.False(retB);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7b, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.True(retB);
+
+            MyBool7a = true;
+            event7?.Invoke(null, null);
+            Assert.Single(CallOrderLog);
+            Assert.Empty(RuntimeCallLog);
+            Assert.Empty(TextLogEvents);
+            Assert.Single(CondCallLog);
+
+            Assert.Equal(CallType.CONDITIONAL_FUNCTION, CallOrderLog.Dequeue());
+            (funcB, args, retB) = CondCallLog.Dequeue();
+            Assert.Equal(MyCondFunc7a, funcB);
+            Assert.True(args == null || !args.Any());
+            Assert.True(retB);
         }
     }
 }

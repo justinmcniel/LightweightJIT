@@ -61,3 +61,13 @@ On MyTrigger6:
 	{
 		MyFunc6(true);
 	}
+
+On MyTrigger7:
+	if(MyCondFunc7a())
+	{}
+	else if(MyCondFunc7b())
+	{
+	}
+	else if (MyCondFunc7c())
+	{ }
+	else { }

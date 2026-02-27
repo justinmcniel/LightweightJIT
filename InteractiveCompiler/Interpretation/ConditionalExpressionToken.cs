@@ -47,7 +47,7 @@ namespace InteractiveCompiler.Interpretation
             }
 
             res.ifExpressionList = ExpressionListToken.TryParse(text, ref internalIndex, compiler);
-            if(res.ifExpressionList == null) { return null; }
+            //if(res.ifExpressionList == null) { return null; }
 
             if (!Utilities.NextTokenMatches(text, ref internalIndex, "}"))
             {
@@ -98,7 +98,8 @@ namespace InteractiveCompiler.Interpretation
             string res = "";
             res += $"if ({ifConditionalToken?.Decompile(indentation)})\r\n{indentation}";
             res += $"{{\r\n{indentation}\t";
-            res += ifExpressionList?.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+            if (ifExpressionList != null)
+            { res += ifExpressionList.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}"; }
             res += $"}}\r\n{indentation}";
 
             res += elseIfExpressionToken?.Decompile(indentation);
@@ -107,7 +108,7 @@ namespace InteractiveCompiler.Interpretation
             {
                 res += $"else\r\n{indentation}";
                 res += $"{{\r\n{indentation}\t";
-                res += elseExpressionList?.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
+                res += elseExpressionList.Decompile(indentation + "\t").TrimEnd() + $"\r\n{indentation}";
                 res += $"}}\r\n{indentation}";
             }
 
@@ -116,11 +117,11 @@ namespace InteractiveCompiler.Interpretation
 
         public Action Compile(IInteractiveCompiler compiler)
         {
-            if (ifConditionalToken == null || ifExpressionList == null)
+            if (ifConditionalToken == null)
             { throw new CompilerException(); }
 
             var IfCond = ifConditionalToken.Compile(compiler);
-            var IfExprCode = ifExpressionList.Compile(compiler);
+            var IfExprCode = ifExpressionList?.Compile(compiler) ?? ((sender, environment) => { });
 
             Func<bool>? ElseIfHandler = elseIfExpressionToken?.Compile(compiler);
 

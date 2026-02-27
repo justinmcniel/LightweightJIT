@@ -19,6 +19,7 @@ namespace InteractiveCompilerTests
         public static event EventHandler<object?>? MyEvent4;
         public static event EventHandler<object?>? MyEvent5;
         public static event EventHandler<object?>? MyEvent6;
+        public static event EventHandler<object?>? MyEvent7;
 
         [Fact, Priority(-2)]
         public static void TestInitialize()
@@ -34,6 +35,7 @@ namespace InteractiveCompilerTests
             Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger4", ref MyEvent4));
             Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger5", ref MyEvent5));
             Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger6", ref MyEvent6));
+            Assert.True(StaticDispatchCompiler.RegisterTriggerEvent("MyTrigger7", ref MyEvent7));
         }
 
         public static readonly TimeSpan CompilationTimeLimit = new(0, 10, 0);
@@ -118,6 +120,13 @@ namespace InteractiveCompilerTests
         {
             Assert.NotNull(MyEvent6);
             CompileTestHelpers.TestTrigger6(MyEvent6.Invoke);
+        }
+
+        [Fact]
+        public static void TestTrigger7()
+        {
+            Assert.NotNull(MyEvent7);
+            CompileTestHelpers.TestTrigger7(MyEvent7.Invoke);
         }
 
         [Fact, Priority(int.MaxValue)]
