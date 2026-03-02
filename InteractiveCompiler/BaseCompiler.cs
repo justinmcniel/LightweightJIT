@@ -17,7 +17,6 @@ namespace InteractiveCompiler
         public Dictionary<int, Guid> CompilationThreadProgramLookupTable { get; } = [];
         private Dictionary<Guid, ProgramToken> ProgramTokenLookupTable { get; } = [];
         private Dictionary<string, (Func<object?> Getter, Action<object?> Setter)> BoundProperties { get; } = [];
-
         public event EventHandler<object?>? OnCompilationComplete;
         private event EventHandler<object?>? DoNotInvoke;
         public Action<string?> InternalLog = (s) => Console.WriteLine(s);
@@ -128,6 +127,7 @@ namespace InteractiveCompiler
                 }
 
                 res |= VariableRegistry.Remove(programID);
+                res |= ProgramTokenLookupTable.Remove(programID);
                 return res;
             }
         }
@@ -147,11 +147,15 @@ namespace InteractiveCompiler
         {
             void Invoker(object? sender, object? triggerArgument)
             {
-                foreach(var (Reaction, ProgramID) in TriggerEventsRegistry[eventName])
+                foreach (var (Reaction, ProgramID) in TriggerEventsRegistry[eventName])
                 {
                     VariableRegistry[ProgramID]["triggerArgument"] = triggerArgument;
                     VariableRegistry[ProgramID]["triggerer"] = sender;
-                    Reaction.Invoke(sender, [ProgramID]);
+                    ThreadPool.QueueUserWorkItem((state) => 
+                    { 
+                        lock (ProgramTokenLookupTable[ProgramID]) 
+                        { Reaction.Invoke(sender, [ProgramID]); }
+                    });
                 }
             };
 

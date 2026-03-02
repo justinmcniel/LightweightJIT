@@ -65,12 +65,14 @@ namespace InteractiveCompilerTests
             ClearLogs();
 
             Compile();
+            Thread.Sleep(100); // the OnAnyCompilationComplete triggers are run asyncronously, wait for them to log
 
             Assert.Equal(2, TextLogEvents.Count);
             Assert.Equal("This Compilation Complete", TextLogEvents.Dequeue());
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
 
             EmptyRegisterer();
+            Thread.Sleep(100); // the OnAnyCompilationComplete triggers are run asyncronously, wait for them to log
 
             Assert.Single(TextLogEvents);
             Assert.Equal("Any compilation complete.", TextLogEvents.Dequeue());
@@ -119,7 +121,7 @@ namespace InteractiveCompilerTests
             CondCallLog.Clear();
             CallOrderLog.Clear();
         }
-
+        private static Semaphore[] Sems { get; } = new Semaphore[7];
         public static void ResetTests()
         {
             ClearLogs();
@@ -134,6 +136,10 @@ namespace InteractiveCompilerTests
             MyBool7a = false;
             MyBool7b = false;
             MyBool7c = false;
+            for(int i = 0; i < Sems.Length; i++)
+            {
+                Sems[i] = new(0, int.MaxValue);
+            }
         }
 
         public static object? MyFunc(IEnumerable<object?>? args)
@@ -157,6 +163,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered by {Parse(sender)} with an argument of {Parse(arg)}");
             TestLog();
             LogCall(MyFunc, args, true);
+            Sems[0].Release();
             return true;
         }
 
@@ -169,6 +176,7 @@ namespace InteractiveCompilerTests
             var sender = "TestTrigger1";
             var triggerArg = 0b1010;
             event1?.Invoke(sender, triggerArg);
+            Assert.True(Sems[0].WaitOne(TimeSpan.FromSeconds(1)));
 
             Assert.Single(CallOrderLog);
             Assert.Empty(CondCallLog);
@@ -208,6 +216,7 @@ namespace InteractiveCompilerTests
             ReturnObj1 = true;
             TestLog();
             LogCall(MyFunc2, args, res);
+            Sems[1].Release();
             return res;
         }
 
@@ -219,6 +228,8 @@ namespace InteractiveCompilerTests
              * MyFunc2-true
              */
             event2?.Invoke(null, null);
+            Assert.True(Sems[1].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[1].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Empty(TextLogEvents);
             Assert.Empty(CondCallLog);
@@ -243,6 +254,7 @@ namespace InteractiveCompilerTests
             Assert.Equal(true, ret);
 
             event2?.Invoke(null, null);
+            Assert.True(Sems[1].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(CallOrderLog);
             Assert.Empty(CondCallLog);
             Assert.Empty(TextLogEvents);
@@ -285,6 +297,7 @@ namespace InteractiveCompilerTests
             }
             TestLog();
             LogCall(MyFunc3c, args, null);
+            Sems[2].Release();
             return null;
         }
 
@@ -293,6 +306,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             TestLog();
             LogCall(MyFunc3d, args, null);
+            Sems[2].Release();
             return null;
         }
 
@@ -304,6 +318,7 @@ namespace InteractiveCompilerTests
              * MyFunc3a-5, MyFunc3b-4, MyFunc3d
              */
             event3?.Invoke(null, null);
+            Assert.True(Sems[2].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Empty(TextLogEvents);
             Assert.Empty(CondCallLog);
@@ -336,6 +351,7 @@ namespace InteractiveCompilerTests
 
 
             event3?.Invoke(null, null);
+            Assert.True(Sems[2].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Empty(TextLogEvents);
             Assert.Empty(CondCallLog);
@@ -367,6 +383,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             TestLog();
             LogCall(MyFunc4a, args, null);
+            Sems[3].Release();
             return null;
         }
 
@@ -375,6 +392,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             TestLog();
             LogCall(MyFunc4b, args, null);
+            Sems[3].Release();
             return null;
         }
 
@@ -383,6 +401,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             TestLog();
             LogCall(MyFunc4c, args, null);
+            Sems[3].Release();
             return null;
         }
 
@@ -391,6 +410,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered");
             TestLog();
             LogCall(MyFunc4d, args, null);
+            Sems[3].Release();
             return null;
         }
 
@@ -453,6 +473,7 @@ namespace InteractiveCompilerTests
              */
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(4, CallOrderLog.Count);
             Assert.Equal(3, CondCallLog.Count);
             Assert.Single(RuntimeCallLog);
@@ -483,6 +504,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(CondCallLog);
             Assert.Single(RuntimeCallLog);
@@ -501,6 +523,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Equal(2, CondCallLog.Count);
             Assert.Single(RuntimeCallLog);
@@ -525,6 +548,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(CondCallLog);
             Assert.Single(RuntimeCallLog);
@@ -543,6 +567,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(5, CallOrderLog.Count);
             Assert.Equal(4, CondCallLog.Count);
             Assert.Single(RuntimeCallLog);
@@ -581,6 +606,7 @@ namespace InteractiveCompilerTests
 
             MyBool3 = false;
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(CondCallLog);
             Assert.Single(RuntimeCallLog);
@@ -599,6 +625,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Equal(2, CondCallLog.Count);
             Assert.Single(RuntimeCallLog);
@@ -623,6 +650,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(CondCallLog);
             Assert.Single(RuntimeCallLog);
@@ -641,6 +669,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event4?.Invoke(null, null);
+            Assert.True(Sems[3].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(5, CallOrderLog.Count);
             Assert.Equal(4, CondCallLog.Count);
             Assert.Single(RuntimeCallLog);
@@ -687,6 +716,7 @@ namespace InteractiveCompilerTests
             TestLog($"Set {nameof(MyBool5b)} to {MyBool5b}");
             TestLog();
             LogCall(MyFunc5, args, null);
+            Sems[4].Release();
             return null;
         }
         public static bool MyCondFunc5a(IEnumerable<object?>? args)
@@ -694,6 +724,7 @@ namespace InteractiveCompilerTests
             TestLog($"{Parse(MethodBase.GetCurrentMethod()?.Name)} Triggered and returned {MyBool5a}");
             TestLog();
             LogCall(MyCondFunc5a, args, MyBool5a);
+            Sems[4].Release();
             return MyBool5a;
         }
 
@@ -703,6 +734,7 @@ namespace InteractiveCompilerTests
             TestLog();
             TestLog();
             LogCall(MyCondFunc5b, args, MyBool5b);
+            Sems[4].Release();
             return MyBool5b;
         }
 
@@ -716,6 +748,7 @@ namespace InteractiveCompilerTests
              */
 
             event5?.Invoke(null, null);
+            Assert.True(Sems[4].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(CallOrderLog);
             Assert.Empty(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -728,6 +761,9 @@ namespace InteractiveCompilerTests
             Assert.True(retB);
 
             event5?.Invoke(null, null);
+            Assert.True(Sems[4].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[4].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[4].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Empty(TextLogEvents);
             Assert.Single(RuntimeCallLog);
@@ -753,6 +789,7 @@ namespace InteractiveCompilerTests
 
 
             event5?.Invoke(null, null);
+            Assert.True(Sems[4].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Empty(TextLogEvents);
             Assert.Empty(RuntimeCallLog);
@@ -782,6 +819,7 @@ namespace InteractiveCompilerTests
         public static object? MyFunc6(IEnumerable<object?>? args)
         {
             LogCall(MyFunc6, args, null);
+            Sems[5].Release();
             return null;
         }
 
@@ -795,6 +833,8 @@ namespace InteractiveCompilerTests
              * MyCondFunc6-t, MyFunc6(true)
              */
             event6?.Invoke(null, null);
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Equal(2, RuntimeCallLog.Count);
             Assert.Empty(TextLogEvents);
@@ -825,6 +865,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event6?.Invoke(null, null);
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -846,6 +887,8 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event6?.Invoke(null, null);
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Equal(2, RuntimeCallLog.Count);
             Assert.Empty(TextLogEvents);
@@ -876,6 +919,7 @@ namespace InteractiveCompilerTests
             Assert.Null(ret);
 
             event6?.Invoke(null, null);
+            Assert.True(Sems[5].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Single(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -901,6 +945,7 @@ namespace InteractiveCompilerTests
         public static bool MyCondFunc7a(IEnumerable<object?>? args)
         {
             LogCall(MyCondFunc7a, args, MyBool7a);
+            Sems[6].Release();
             return MyBool7a;
         }
 
@@ -908,6 +953,7 @@ namespace InteractiveCompilerTests
         public static bool MyCondFunc7b(IEnumerable<object?>? args)
         {
             LogCall(MyCondFunc7b, args, MyBool7b);
+            Sems[6].Release();
             return MyBool7b;
         }
 
@@ -915,6 +961,7 @@ namespace InteractiveCompilerTests
         public static bool MyCondFunc7c(IEnumerable<object?>? args)
         {
             LogCall(MyCondFunc7c, args, MyBool7c);
+            Sems[6].Release();
             return MyBool7b;
         }
 
@@ -929,6 +976,9 @@ namespace InteractiveCompilerTests
              */
 
             event7?.Invoke(null, null);
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Empty(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -954,6 +1004,9 @@ namespace InteractiveCompilerTests
 
             MyBool7c = true;
             event7?.Invoke(null, null);
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(3, CallOrderLog.Count);
             Assert.Empty(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -979,6 +1032,8 @@ namespace InteractiveCompilerTests
 
             MyBool7b = true;
             event7?.Invoke(null, null);
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Equal(2, CallOrderLog.Count);
             Assert.Empty(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
@@ -998,6 +1053,7 @@ namespace InteractiveCompilerTests
 
             MyBool7a = true;
             event7?.Invoke(null, null);
+            Assert.True(Sems[6].WaitOne(TimeSpan.FromSeconds(1)));
             Assert.Single(CallOrderLog);
             Assert.Empty(RuntimeCallLog);
             Assert.Empty(TextLogEvents);
